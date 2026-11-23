@@ -20,6 +20,11 @@ func _ready():
 	playback = player.get_stream_playback()
 
 func tocar(tipo: String):
+	if not is_instance_valid(player):
+		return
+	player.stop()
+	player.play()
+	playback = player.get_stream_playback()
 	if not is_instance_valid(playback):
 		return
 	playback.clear_buffer()

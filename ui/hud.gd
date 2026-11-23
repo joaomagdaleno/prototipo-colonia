@@ -5,7 +5,6 @@ var label_modo: Label
 var label_atalhos: Label
 var _ultimo_texto_topo: String = ""
 var _ultimo_texto_colonos: String = ""
-var _ultimo_texto_atalhos: String = ""
 var painel_baixo: PanelContainer
 var mira: ColorRect
 var flash_dano: ColorRect

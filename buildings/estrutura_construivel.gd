@@ -17,7 +17,6 @@ var canteiro_plantado: bool = false
 var progresso_cultivo: float = 0.0
 var reservado_colono: bool = false
 var mesh_cultivo: MeshInstance3D = null
-var _timer_cultivo: float = 1.0
 @export var is_parede: bool = false
 @export var is_teto: bool = false
 @export var modo_macro: bool = true
