@@ -188,7 +188,7 @@ func receber_dano(dano: int):
 
 	if vida <= 0:
 		Global.couro += 2
-		print("?? Criatura noturna derrotada! +2 Couro")
+		print("💀 Criatura noturna derrotada! +2 Couro")
 		queue_free()
 
 func _on_velocity_computed(safe_velocity: Vector3):

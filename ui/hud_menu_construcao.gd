@@ -25,6 +25,9 @@ var catalogo := [
 		"icone": "ðŸ”¥",
 		"itens": [
 			{"nome": "Fogueira", "cena_path": "res://buildings/Fogueira.tscn", "icone": "ðŸ”¥", "desc": "Aquece, ilumina Ã  noite e cozinha alimentos."},
+			{"nome": "Canteiro de Cultivo", "cena_path": "res://buildings/Canteiro.tscn", "icone": "🌱", "desc": "Plante 1 Fruta para colher +4 Frutas. Cresce 2x mais rápido na chuva."},
+			{"nome": "Poço de Água", "cena_path": "res://buildings/PocoAgua.tscn", "icone": "🚰", "desc": "Fonte de água limpa na base (+50% Sede ao interagir com [E])."},
+			{"nome": "Mesa de Curtume", "cena_path": "res://buildings/Curtume.tscn", "icone": "🧵", "desc": "Curte 2 Carnes Cruas -> +1 Couro ou corta 1 Couro -> +4 Gravetos com [E]."},
 			{"nome": "BaÃº de Estoque", "cena_path": "res://buildings/Bau.tscn", "icone": "ðŸ“¦", "desc": "Armazena atÃ© 150 recursos com descarga rÃ¡pida."},
 			{"nome": "Cama de Madeira", "cena_path": "res://buildings/Cama.tscn", "icone": "ðŸ›ï¸", "desc": "Permite dormir durante a noite atÃ© amanhecer."},
 			{"nome": "Bancada Central", "cena_path": "res://buildings/Bancada.tscn", "icone": "ðŸ› ï¸", "desc": "Mesa de trabalho e acesso ao Planejador AÃ©reo."},

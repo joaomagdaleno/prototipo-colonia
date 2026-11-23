@@ -123,5 +123,5 @@ func receber_dano(dano: int):
 	if vida <= 0:
 		Global.carne_crua += carne_ao_abater
 		Global.couro += couro_ao_abater
-		print("?? Caï¿½a abatida (", especie, ")! +", carne_ao_abater, " Carne Crua | +", couro_ao_abater, " Couro")
+		print("🦌 Caça abatida (", especie, ")! +", carne_ao_abater, " Carne Crua | +", couro_ao_abater, " Couro")
 		queue_free()

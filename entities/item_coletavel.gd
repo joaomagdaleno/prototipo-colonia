@@ -41,8 +41,8 @@ func colher():
 	
 	if tipo_item == "graveto":
 		Global.gravetos += total
-		print("?? Gravetos coletados! +", total, " | Total: ", Global.gravetos)
+		print("🌿 Gravetos coletados! +", total, " | Total: ", Global.gravetos)
 	elif tipo_item == "pedrinha":
 		Global.pedrinhas += total
-		print("?? Pedrinha coletada! +", total, " | Total: ", Global.pedrinhas)
+		print("🪨 Pedrinha coletada! +", total, " | Total: ", Global.pedrinhas)
 	queue_free()

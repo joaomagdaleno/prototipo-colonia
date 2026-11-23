@@ -14,6 +14,8 @@ var label_dica_mira: Label
 var painel_colonos: PanelContainer
 var label_lista_colonos: Label
 var botao_contratar: Button
+var btn_ferramentas_equipe: Button
+var btn_mochilas_equipe: Button
 var painel_objetivos: PanelContainer
 var label_objetivos: Label
 var _timer_objetivos: float = 0.0
@@ -92,6 +94,16 @@ func _montar_hud_base():
 	botao_contratar = Button.new()
 	botao_contratar.pressed.connect(func(): Global.contratar_colono())
 	vbox_col.add_child(botao_contratar)
+
+	btn_ferramentas_equipe = Button.new()
+	btn_ferramentas_equipe.add_theme_font_size_override("font_size", 13)
+	btn_ferramentas_equipe.pressed.connect(func(): Global.forjar_ferramentas_equipe(); _timer_lista_colonos = 0.0)
+	vbox_col.add_child(btn_ferramentas_equipe)
+
+	btn_mochilas_equipe = Button.new()
+	btn_mochilas_equipe.add_theme_font_size_override("font_size", 13)
+	btn_mochilas_equipe.pressed.connect(func(): Global.forjar_mochilas_equipe(); _timer_lista_colonos = 0.0)
+	vbox_col.add_child(btn_mochilas_equipe)
 	
 	label_lista_colonos = Label.new()
 	label_lista_colonos.add_theme_font_size_override("font_size", 13)
@@ -188,8 +200,8 @@ func _process(delta):
 		"  |  ðŸ« " + str(Global.frutas) +
 		"  |  ðŸ¥© " + str(Global.carne_crua) +
 		"  |  ðŸ² " + str(Global.comida) +
-		"  |  ðŸ•’ " + Global.obter_hora_formatada() +
-		"  |  " + Global.obter_texto_clima()
+		"  |  ðŸ•’ " + "Dia " + str(Global.dia_atual) + " - " + Global.obter_hora_formatada() +
+		"  |  " + Global.obter_texto_clima() + ("  |  🐺 HORDA NOTURNA!" if Global.is_noite_de_horda() else "")
 	)
 	if _novo_topo != _ultimo_texto_topo:
 		_ultimo_texto_topo = _novo_topo
@@ -220,6 +232,10 @@ func _process(delta):
 			_timer_lista_colonos = 0.25
 			botao_contratar.text = "🤝 Contratar Colono (" + str(Global.CUSTO_CONTRATAR_COLONO) + " Comida)" + (" [Y]" if joy else "")
 			botao_contratar.disabled = Global.comida < Global.CUSTO_CONTRATAR_COLONO
+			btn_ferramentas_equipe.text = "✅ Ferramentas Equipe (2x Trabalho)" if Global.equipe_ferramentas else "🪓 Ferramentas Equipe (8 Mad, 6 Ped, 2 Couro)"
+			btn_ferramentas_equipe.disabled = Global.equipe_ferramentas or Global.madeira < 8 or Global.pedra < 6 or Global.couro < 2
+			btn_mochilas_equipe.text = "✅ Mochilas Equipe (30 Cap / +20% Vel)" if Global.equipe_mochilas else "🎒 Mochilas Equipe (6 Couro, 6 Grav)"
+			btn_mochilas_equipe.disabled = Global.equipe_mochilas or Global.couro < 6 or Global.gravetos < 6
 			var colonos = get_tree().get_nodes_in_group("colonos")
 			var _novo_col = ""
 			if colonos.is_empty():

@@ -3,6 +3,8 @@ extends Node3D
 var particulas: GPUParticles3D
 var sol: DirectionalLight3D
 var _jogador: Node3D
+var _timer_relampago: float = 6.0
+var _flash_relampago: float = 0.0
 
 func _ready():
 	sol = get_parent().get_node_or_null("DirectionalLight3D")
@@ -66,9 +68,19 @@ func _process(delta):
 		var energia_alvo = 1.0
 		if Global.clima_atual == Global.Clima.NUBLADO:
 			energia_alvo = 0.65
+		elif Global.clima_atual == Global.Clima.TEMPESTADE:
+			energia_alvo = 0.32
+			_timer_relampago -= delta
+			if _timer_relampago <= 0.0:
+				_timer_relampago = randf_range(8.0, 16.0)
+				_flash_relampago = 0.14
+				AudioManager.tocar("trovao")
 		elif chovendo:
 			energia_alvo = 0.45
 		
 		# Sï¿½ interpola se ainda nï¿½o chegou no valor alvo
-		if not is_equal_approx(sol.light_energy, energia_alvo):
+		if _flash_relampago > 0.0:
+			_flash_relampago -= delta
+			sol.light_energy = 2.4
+		elif not is_equal_approx(sol.light_energy, energia_alvo):
 			sol.light_energy = lerp(sol.light_energy, energia_alvo, 2.0 * delta)

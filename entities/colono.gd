@@ -16,6 +16,9 @@ var mochila: Dictionary = {
 }
 const CAPACIDADE_MOCHILA := 15
 
+func obter_capacidade_maxima() -> int:
+	return 30 if Global.equipe_mochilas else CAPACIDADE_MOCHILA
+
 func obter_carga_mochila() -> int:
 	var total = 0
 	for qtd in mochila.values():
@@ -78,7 +81,8 @@ func _physics_process(delta):
 		var alvo_atual = tarefas.obter_alvo_atual()
 		var fator = Global.obter_fator_logistica(alvo_atual.global_position) if is_instance_valid(alvo_atual) else 1.0
 		
-		if tempo_trabalhando > 0.5 * fator:
+		var mult_ferr = 0.5 if Global.equipe_ferramentas else 1.0
+		if tempo_trabalhando > 0.5 * fator * mult_ferr:
 			tarefas.concluir_trabalho(fator)
 			esta_trabalhando = false
 			tempo_trabalhando = 0.0
@@ -170,31 +174,37 @@ func _tentar_alimentar_colono():
 				return
 
 func _calcular_velocidade_atual() -> float:
+	var mult_moch = 1.2 if Global.equipe_mochilas else 1.0
 	var cx = int(round(global_position.x))
 	var cz = int(round(global_position.z))
 	for ox in [-1, 0, 1]:
 		for oz in [-1, 0, 1]:
 			if Global.estradas_pos.has(Vector2i(cx + ox, cz + oz)):
-				return 4.5
-	return VELOCIDADE
+				return 4.5 * mult_moch
+	return VELOCIDADE * mult_moch
 
 func obter_status_texto() -> String:
 	var est = str(int(energia)) + "%"
 	var carga = obter_carga_mochila()
 	if dormindo:
-		agent.set_velocity(Vector3.ZERO) return "ðŸ’¤ Dormindo (" + est + ")"
+		agent.set_velocity(Vector3.ZERO)
+		return "💤 Dormindo (" + est + ")"
 	if esta_trabalhando:
 		agent.set_velocity(Vector3.ZERO)
-		if is_instance_valid(tarefas.alvo): return "ðŸ”¨ Construindo (" + est + ")"
-		if is_instance_valid(tarefas.alvo_arvore): return "ðŸª“ Cortando (" + est + ")"
-		if is_instance_valid(tarefas.alvo_pedra): return "â›ï¸ Minerando (" + est + ")"
-		if tarefas.tipo_alvo == "bau": return "ðŸ“¦ Guardando (" + est + ")"
-		return "ðŸŒ¿ Coletando (" + est + ")"
+		if is_instance_valid(tarefas.alvo): return "🔨 Construindo (" + est + ")"
+		if is_instance_valid(tarefas.alvo_arvore): return "🪓 Cortando (" + est + ")"
+		if is_instance_valid(tarefas.alvo_pedra): return "⛏ Minerando (" + est + ")"
+		if tarefas.tipo_alvo == "colher_canteiro": return "🌾 Colhendo canteiro (" + est + ")" 
+		if tarefas.tipo_alvo == "plantar_canteiro": return "🌱 Plantando canteiro (" + est + ")" 
+		if tarefas.tipo_alvo == "bau": return "📦 Guardando (" + est + ")"
+		return "🌿 Coletando (" + est + ")"
 	if tarefas.tem_alvo():
+		if tarefas.tipo_alvo == "colher_canteiro": return "🌾 Colhendo canteiro (" + est + ")" 
+		if tarefas.tipo_alvo == "plantar_canteiro": return "🌱 Plantando canteiro (" + est + ")" 
 		if tarefas.tipo_alvo == "bau":
-			return "ðŸ“¦ Levando ao BaÃº [" + str(carga) + "/" + str(CAPACIDADE_MOCHILA) + "] (" + est + ")"
-		return "ðŸš¶ Indo trabalhar (" + est + ")"
-	return "â³ Sem ordens (" + est + ")"
+			return "📦 Levando ao Baú [" + str(carga) + "/" + str(obter_capacidade_maxima()) + "] (" + est + ")"
+		return "🚶 Indo trabalhar (" + est + ")"
+	return "⏳ Sem ordens (" + est + ")"
 
 func _otimizar_renderizacao_vega8():
 	for filho in get_children():

@@ -21,9 +21,9 @@ func salvar_jogo() -> bool:
 			"frutas": Global.frutas,
 			"carne_crua": Global.carne_crua,
 			"couro": Global.couro,
-			"hora_do_dia": Global.hora_do_dia,
+			"hora_do_dia": Global.hora_do_dia, "dia_atual": Global.dia_atual,
 			"clima_atual": int(Global.clima_atual),
-			"tem_machado_pedra": Global.tem_machado_pedra,
+			"tem_machado_pedra": Global.tem_machado_pedra, "tier_machado": Global.tier_machado, "tier_picareta": Global.tier_picareta, "tier_lanca": Global.tier_lanca, "equipe_ferramentas": Global.equipe_ferramentas, "equipe_mochilas": Global.equipe_mochilas,
 			"tem_mochila_couro": Global.tem_mochila_couro,
 			"vida_jogador": Global.vida_jogador,
 			"saciedade_jogador": Global.saciedade_jogador,
@@ -46,7 +46,7 @@ func salvar_jogo() -> bool:
 				"rot_y": est.rotation.y,
 				"construida": est.construida if "construida" in est else true,
 				"vida_atual": est.vida_atual if "vida_atual" in est else 100,
-				"estoque_bau": est.estoque_bau.duplicate() if ("estoque_bau" in est and est.is_bau) else {}
+				"estoque_bau": est.estoque_bau.duplicate() if ("estoque_bau" in est and est.is_bau) else {}, "canteiro_plantado": est.canteiro_plantado if ("is_canteiro" in est and est.is_canteiro) else false, "progresso_cultivo": est.progresso_cultivo if ("is_canteiro" in est and est.is_canteiro) else 0.0
 			})
 			
 	for col in get_tree().get_nodes_in_group("colonos"):
@@ -104,8 +104,15 @@ func carregar_jogo() -> bool:
 	Global.carne_crua = int(rec.get("carne_crua", 0))
 	Global.couro = int(rec.get("couro", 0))
 	Global.hora_do_dia = float(rec.get("hora_do_dia", 8.0))
+	Global.dia_atual = int(rec.get("dia_atual", 1))
 	Global.clima_atual = int(rec.get("clima_atual", 0)) as Global.Clima
 	Global.tem_machado_pedra = bool(rec.get("tem_machado_pedra", false))
+	Global.tier_machado = int(rec.get("tier_machado", 1 if Global.tem_machado_pedra else 0))
+	Global.tier_picareta = int(rec.get("tier_picareta", 0))
+	Global.tier_lanca = int(rec.get("tier_lanca", 0))
+	Global.equipe_ferramentas = bool(rec.get("equipe_ferramentas", false))
+	Global.equipe_mochilas = bool(rec.get("equipe_mochilas", false))
+	Global.tem_machado_pedra = Global.tier_machado >= 1
 	Global.tem_mochila_couro = bool(rec.get("tem_mochila_couro", false))
 	Global.vida_jogador = int(rec.get("vida_jogador", 100))
 	Global.saciedade_jogador = float(rec.get("saciedade_jogador", 85.0))
@@ -114,6 +121,8 @@ func carregar_jogo() -> bool:
 	Global.baus_ativos.clear()
 	Global.fogueiras_ativas.clear()
 	Global.camas_ativas.clear()
+	Global.canteiros_ativos.clear()
+	Global.pocos_ativos.clear()
 	Global.estoque_total_baus = {"madeira": 0, "pedra": 0, "gravetos": 0, "pedrinhas": 0, "comida": 0, "frutas": 0}
 	
 	var jogador = get_tree().current_scene.get_node_or_null("Jogador")
@@ -145,6 +154,12 @@ func carregar_jogo() -> bool:
 				inst.custo_madeira = c_mad; inst.custo_pedra = c_ped; inst.custo_gravetos = c_grav; inst.custo_pedrinhas = c_pedr
 			if item.has("vida_atual") and "vida_atual" in inst:
 				inst.vida_atual = int(item["vida_atual"])
+			if item.has("canteiro_plantado") and "is_canteiro" in inst and inst.is_canteiro:
+				inst.canteiro_plantado = bool(item["canteiro_plantado"])
+				inst.progresso_cultivo = float(item.get("progresso_cultivo", 0.0))
+				if inst.canteiro_plantado:
+					inst.set_process(true)
+				inst._atualizar_visual_cultivo()
 			if item.has("estoque_bau") and "estoque_bau" in inst and inst.is_bau:
 				inst.estoque_bau = item["estoque_bau"].duplicate()
 				if not inst in Global.baus_ativos:

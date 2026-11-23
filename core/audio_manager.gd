@@ -37,7 +37,12 @@ duracao = 0.09; freq_ini = 440.0; freq_fim = 660.0; ruido = 0.0
 duracao = 0.16; freq_ini = 260.0; freq_fim = 390.0; ruido = 0.15
 "portao":
 duracao = 0.18; freq_ini = 120.0; freq_fim = 180.0; ruido = 0.25
-"dano":
+"trovao":
+			duracao = 1.1
+			freq_ini = 95.0
+			freq_fim = 32.0
+			ruido = 0.85
+		"dano":
 duracao = 0.22; freq_ini = 130.0; freq_fim = 55.0; ruido = 0.35
 
 var total_frames = int(TAXA_AMOSTRAGEM * duracao)

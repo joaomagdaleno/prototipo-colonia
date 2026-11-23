@@ -2,12 +2,20 @@ extends Node
 
 @onready var jogador: CharacterBody3D = get_parent()
 @onready var raycast: RayCast3D = get_parent().get_node("Camera3D/RayCast3D")
+var mao_ferramenta: Node3D
+var mesh_cabo: MeshInstance3D
+var mesh_cabeca: MeshInstance3D
+var _tipo_equipado: String = ""
+
+func _ready():
+	_criar_visual_ferramenta()
 
 func executar_golpe():
+	_animar_golpe_mao()
 	if raycast.is_colliding():
 		var alvo = raycast.get_collider()
 		if alvo.has_method("receber_dano"):
-			var dano = 2 if Global.tem_machado_pedra else 1
+			var dano = _calcular_dano_contra(alvo)
 			AudioManager.tocar("golpe")
 			alvo.receber_dano(dano)
 			return
@@ -43,7 +51,22 @@ func executar_interacao():
 					print("Você dormiu na cama até amanhecer (06:00)!")
 				else:
 					print("Só é possível dormir durante a noite (após 20:00).")
-			elif estrutura.is_fogueira and estrutura.construida:
+			elif estrutura.is_curtume and estrutura.construida:
+			estrutura.curtir_material()
+		elif estrutura.is_poco and estrutura.construida:
+			Global.beber_agua_jogador()
+			AudioManager.tocar("coleta")
+		elif estrutura.is_canteiro and estrutura.construida:
+			if not estrutura.canteiro_plantado:
+				if not estrutura.plantar_canteiro():
+					print("Voce precisa de pelo menos 1 Fruta para plantar!")
+			elif estrutura.progresso_cultivo >= 100.0:
+				var colhidas = estrutura.colher_canteiro(true)
+				Global.frutas += colhidas
+				print("Colheu +", colhidas, " Frutas do canteiro!")
+			else:
+				print("Cultivo em andamento: ", int(estrutura.progresso_cultivo), "%")
+		elif estrutura.is_fogueira and estrutura.construida:
 				estrutura.cozinhar()
 			elif estrutura.is_portao and estrutura.construida:
 				estrutura.alternar_portao()
@@ -100,6 +123,18 @@ func obter_dica_mira() -> String:
 		elif est.is_bau:
 			var total = est.obter_total_itens_bau()
 			return btn_interagir + " Guardar/Pegar (" + str(total) + "/" + str(est.CAPACIDADE_MAXIMA_BAU) + " | " + est.obter_resumo_bau() + ")"
+		elif est.is_curtume:
+			if Global.carne_crua >= 2: return btn_usar + " Curtir Couro (2 Carne -> +1 Couro)"
+			elif Global.couro >= 1: return btn_usar + " Cortar Tiras (1 Couro -> +4 Gravetos)"
+			return "Mesa de Curtume (Requer 2 Carne Crua ou 1 Couro)"
+		elif est.is_poco:
+			return btn_usar + " Beber Água do Poço (+45% Sede)"
+		elif est.is_canteiro:
+			if not est.canteiro_plantado:
+				return btn_usar + " Plantar Semente (1 Fruta)"
+			elif est.progresso_cultivo >= 100.0:
+				return btn_usar + " Colher Cultivo (+4 Frutas)"
+			return "🌱 Cultivando... " + str(int(est.progresso_cultivo)) + "%"
 		elif est.is_fogueira:
 			return btn_interagir + " Cozinhar (1 Carne -> 8 Comida | 2 Frutas -> 5)"
 		elif est.is_cama:
@@ -113,13 +148,13 @@ func obter_dica_mira() -> String:
 				return btn_interagir + " Reparar Muro (" + str(est.vida_atual) + "/" + str(est.vida_maxima) + " HP | 1 Ped)"
 			return "Muro de Pedra (" + str(est.vida_atual) + "/" + str(est.vida_maxima) + " HP)"
 			
-	if alvo.is_in_group("arvores"):
-		return btn_bater + " Cortar Árvore"
-	elif alvo.is_in_group("pedras"):
-		return btn_bater + " Minerar Rocha"
-	elif alvo.is_in_group("animais"):
-		return btn_bater + " Caçar " + alvo.especie.capitalize()
-	elif alvo.is_in_group("inimigos"):
+	_atualizar_visual_ferramenta("machado")`n`tif alvo.is_in_group("arvores"):
+		return btn_bater + " Cortar Árvore (Dano " + str(_calcular_dano_contra(alvo)) + ")"
+	elif alvo.is_in_group("pedras"):`n`t`t_atualizar_visual_ferramenta("picareta")
+		return btn_bater + " Minerar Rocha (Dano " + str(_calcular_dano_contra(alvo)) + ")"
+	elif alvo.is_in_group("animais"):`n`t`t_atualizar_visual_ferramenta("lanca")
+		return btn_bater + " Caçar " + alvo.especie.capitalize() + " (Dano " + str(_calcular_dano_contra(alvo)) + ")"
+	elif alvo.is_in_group("inimigos"):`n`t`t_atualizar_visual_ferramenta("lanca")
 		return btn_bater + " Atacar Criatura (" + str(alvo.vida) + " HP)"
 	elif alvo.is_in_group("arbustos"):
 		return btn_interagir + " Colher Frutas" if ("tem_frutas" in alvo and alvo.tem_frutas) else "Arbusto (Sem frutas)"
@@ -130,3 +165,85 @@ func obter_dica_mira() -> String:
 		return btn_interagir + " Beber Água (+45% Sede)"
 		
 	return ""
+
+func _calcular_dano_contra(alvo: Node) -> int:
+	var tier := 0
+	_atualizar_visual_ferramenta("machado")`n`tif alvo.is_in_group("arvores"):
+		tier = Global.tier_machado
+	elif alvo.is_in_group("pedras"):`n`t`t_atualizar_visual_ferramenta("picareta")
+		tier = Global.tier_picareta
+	elif alvo.is_in_group("animais") or alvo.is_in_group("inimigos"):
+		tier = Global.tier_lanca
+	if tier >= 2:
+		return 4
+	elif tier == 1:
+		return 2
+	return 1
+
+func _criar_visual_ferramenta():
+	var cam = get_parent().get_node_or_null("Camera3D")
+	if not is_instance_valid(cam): return
+	mao_ferramenta = Node3D.new()
+	mao_ferramenta.position = Vector3(0.38, -0.32, -0.58)
+	mao_ferramenta.rotation_degrees = Vector3(15, -12, 8)
+	cam.add_child(mao_ferramenta)
+
+	mesh_cabo = MeshInstance3D.new()
+	var box_cabo = BoxMesh.new()
+	box_cabo.size = Vector3(0.04, 0.45, 0.04)
+	var mat_cabo = StandardMaterial3D.new()
+	mat_cabo.albedo_color = Color(0.45, 0.26, 0.12)
+	box_cabo.material = mat_cabo
+	mesh_cabo.mesh = box_cabo
+	mesh_cabo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mao_ferramenta.add_child(mesh_cabo)
+
+	mesh_cabeca = MeshInstance3D.new()
+	var box_cab = BoxMesh.new()
+	box_cab.size = Vector3(0.18, 0.12, 0.05)
+	var mat_cab = StandardMaterial3D.new()
+	mat_cab.albedo_color = Color(0.55, 0.58, 0.62)
+	box_cab.material = mat_cab
+	mesh_cabeca.mesh = box_cab
+	mesh_cabeca.position = Vector3(0, 0.18, -0.04)
+	mesh_cabeca.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mao_ferramenta.add_child(mesh_cabeca)
+	mao_ferramenta.visible = false
+
+func _atualizar_visual_ferramenta(contexto: String):
+	if not is_instance_valid(mao_ferramenta): return
+	if jogador.construindo_1p or jogador.no_modo_construcao:
+		mao_ferramenta.visible = false
+		return
+	var tier := 0
+	if contexto == "machado": tier = Global.tier_machado
+	elif contexto == "picareta": tier = Global.tier_picareta
+	elif contexto == "lanca": tier = Global.tier_lanca
+	if tier <= 0:
+		mao_ferramenta.visible = false
+		return
+	mao_ferramenta.visible = true
+	var chave = contexto + "_" + str(tier)
+	if chave == _tipo_equipado: return
+	_tipo_equipado = chave
+	var mat = mesh_cabeca.mesh.material as StandardMaterial3D
+	mat.albedo_color = Color(0.78, 0.82, 0.88) if tier >= 2 else Color(0.52, 0.54, 0.58)
+	if contexto == "machado":
+		mesh_cabo.scale = Vector3(1, 1, 1)
+		mesh_cabeca.scale = Vector3(1.0, 1.1, 1.0)
+		mesh_cabeca.position = Vector3(0, 0.18, -0.05)
+	elif contexto == "picareta":
+		mesh_cabo.scale = Vector3(1, 1, 1)
+		mesh_cabeca.scale = Vector3(1.8, 0.55, 0.8)
+		mesh_cabeca.position = Vector3(0, 0.2, 0)
+	elif contexto == "lanca":
+		mesh_cabo.scale = Vector3(0.8, 1.7, 0.8)
+		mesh_cabeca.scale = Vector3(0.45, 1.4, 0.5)
+		mesh_cabeca.position = Vector3(0, 0.36, 0)
+		if tier == 1: mat.albedo_color = Color(0.58, 0.36, 0.18)
+
+func _animar_golpe_mao():
+	if not is_instance_valid(mao_ferramenta) or not mao_ferramenta.visible: return
+	var tw = create_tween()
+	tw.tween_property(mao_ferramenta, "rotation_degrees:x", -45.0, 0.07)
+	tw.tween_property(mao_ferramenta, "rotation_degrees:x", 15.0, 0.09)

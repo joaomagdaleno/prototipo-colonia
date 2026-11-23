@@ -1,0 +1,38 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://buildings/estrutura_construivel.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_terra"]
+albedo_color = Color(0.24, 0.15, 0.08, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="BoxMesh_canteiro"]
+material = SubResource("StandardMaterial3D_terra")
+size = Vector3(1.2, 0.16, 1.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fisico"]
+size = Vector3(1.2, 0.16, 1.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_area"]
+size = Vector3(1.3, 0.5, 1.3)
+
+[node name="Canteiro" type="Node3D" groups=["canteiros"]]
+script = ExtResource("1_script")
+custo_madeira = 4
+is_canteiro = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)
+mesh = SubResource("BoxMesh_canteiro")
+
+[node name="CorpoFisico" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CorpoFisico"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)
+shape = SubResource("BoxShape3D_fisico")
+
+[node name="AreaInteracao" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AreaInteracao"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+shape = SubResource("BoxShape3D_area")

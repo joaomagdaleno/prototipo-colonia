@@ -10,6 +10,14 @@ class_name EstruturaConstruivel
 @export var is_cama: bool = false
 @export var is_fogueira: bool = false
 @export var is_bau: bool = false
+@export var is_canteiro: bool = false
+@export var is_poco: bool = false
+@export var is_curtume: bool = false
+var canteiro_plantado: bool = false
+var progresso_cultivo: float = 0.0
+var reservado_colono: bool = false
+var mesh_cultivo: MeshInstance3D = null
+var _timer_cultivo: float = 1.0
 @export var is_parede: bool = false
 @export var is_teto: bool = false
 @export var modo_macro: bool = true
@@ -121,6 +129,10 @@ func construir() -> bool:
 		Global.fogueiras_ativas.erase(self)
 	if is_cama:
 		Global.camas_ativas.erase(self)
+	if is_canteiro:
+		Global.canteiros_ativos.erase(self)
+	if is_poco:
+		Global.pocos_ativos.erase(self)
 	if construida:
 		return false
 		
@@ -167,6 +179,15 @@ func construir() -> bool:
 	
 	if is_bau:
 		add_to_group("baus")
+	if is_canteiro:
+		add_to_group("canteiros")
+	if is_poco:
+		add_to_group("pocos")
+		if not self in Global.pocos_ativos:
+			Global.pocos_ativos.append(self)
+		if not self in Global.canteiros_ativos:
+			Global.canteiros_ativos.append(self)
+		_criar_visual_cultivo()
 		if not self in Global.baus_ativos:
 			Global.baus_ativos.append(self)
 	
@@ -198,19 +219,19 @@ func cozinhar() -> bool:
 		return false
 		
 	if Global.esta_chovendo() and not esta_protegida_da_chuva():
-		print("??? A fogueira apagou por causa da chuva! Construa um teto acima dela.")
+		print("🌧 A fogueira apagou por causa da chuva! Construa um teto acima dela.")
 		return false
 		
 	if Global.carne_crua >= 1:
 		Global.carne_crua -= 1
 		Global.comida += 8
-		print("?? Carne assada na fogueira! -1 Carne Crua | +8 Comida Pronta")
+		print("🍖 Carne assada na fogueira! -1 Carne Crua | +8 Comida Pronta")
 		return true
 		
 	elif Global.frutas >= 2:
 		Global.frutas -= 2
 		Global.comida += 5
-		print("?? Frutas cozidas! -2 Frutas | +5 Comida Pronta")
+		print("🍲 Frutas cozidas! -2 Frutas | +5 Comida Pronta")
 		return true
 		
 	else:
@@ -229,6 +250,10 @@ func demolir():
 		Global.fogueiras_ativas.erase(self)
 	if is_cama:
 		Global.camas_ativas.erase(self)
+	if is_canteiro:
+		Global.canteiros_ativos.erase(self)
+	if is_poco:
+		Global.pocos_ativos.erase(self)
 	if construida:
 		Global.madeira += int(custo_madeira / 2.0)
 		Global.pedra += int(custo_pedra / 2.0)
@@ -280,13 +305,13 @@ func alternar_portao():
 	var angulo_alvo = rotation.y + (PI / 2.0 if portao_aberto else -PI / 2.0)
 	var tween = create_tween()
 	tween.tween_property(self, "rotation:y", angulo_alvo, 0.25)
-	print("?? Portï¿½o ", "ABERTO" if portao_aberto else "FECHADO")
+	print("🚪 Portão ", "ABERTO" if portao_aberto else "FECHADO")
 
 func receber_dano_estrutura(dano: int):
 	if not construida:
 		return
 	vida_atual -= dano
-	print("?? Estrutura atingida! HP: ", vida_atual, "/", vida_maxima)
+	print("🛡 Estrutura atingida! HP: ", vida_atual, "/", vida_maxima)
 	
 	# Tremida rï¿½pida de impacto
 	var tween = create_tween()
@@ -294,7 +319,7 @@ func receber_dano_estrutura(dano: int):
 	tween.tween_property(mesh, "scale", Vector3(1.0, 1.0, 1.0), 0.05)
 	
 	if vida_atual <= 0:
-		print("?? Estrutura destruï¿½da pelos inimigos!")
+		print("💥 Estrutura destruída pelos inimigos!")
 		Global.atualizar_navmesh_otimizado()
 		queue_free()
 
@@ -304,12 +329,12 @@ func reparar() -> bool:
 		
 	if is_muro:
 		if Global.pedra < 1:
-			print("?? Precisa de 1 Pedra para reparar o muro!")
+			print("⚠ Precisa de 1 Pedra para reparar o muro!")
 			return false
 		Global.pedra -= 1
 	elif is_portao:
 		if Global.madeira < 1:
-			print("?? Precisa de 1 Madeira para reparar o portï¿½o!")
+			print("⚠ Precisa de 1 Madeira para reparar o portão!")
 			return false
 		Global.madeira -= 1
 	else:
@@ -444,3 +469,72 @@ func _configurar_obstaculo_navegacao():
 		obstaculo_nav.use_3d_avoidance = false
 		add_child(obstaculo_nav)
 	obstaculo_nav.avoidance_enabled = not (is_portao and portao_aberto)
+
+func _criar_visual_cultivo():
+	if is_instance_valid(mesh_cultivo): return
+	mesh_cultivo = MeshInstance3D.new()
+	var box = BoxMesh.new()
+	box.size = Vector3(0.75, 0.55, 0.75)
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = Color(0.2, 0.65, 0.2)
+	box.material = mat
+	mesh_cultivo.mesh = box
+	mesh_cultivo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mesh_cultivo.position = Vector3(0, 0.25, 0)
+	mesh_cultivo.visible = false
+	add_child(mesh_cultivo)
+	_atualizar_visual_cultivo()
+
+func _atualizar_visual_cultivo():
+	if not is_instance_valid(mesh_cultivo): return
+	if not canteiro_plantado:
+		mesh_cultivo.visible = false
+		return
+	mesh_cultivo.visible = true
+	var esc = lerp(0.25, 1.0, progresso_cultivo / 100.0)
+	mesh_cultivo.scale = Vector3(esc, esc, esc)
+	var mat = mesh_cultivo.mesh.material as StandardMaterial3D
+	mat.albedo_color = Color(0.85, 0.18, 0.22) if progresso_cultivo >= 100.0 else Color(0.22, 0.68, 0.22)
+
+func plantar_canteiro() -> bool:
+	if not construida or not is_canteiro or canteiro_plantado:
+		return false
+	if _obter_total_disponivel("frutas") < 1:
+		return false
+	_consumir_recurso_global_ou_bau("frutas", 1)
+	canteiro_plantado = true
+	progresso_cultivo = 0.0
+	set_process(true)
+	_atualizar_visual_cultivo()
+	AudioManager.tocar("coleta")
+	print("Semente de fruta plantada no canteiro!")
+	return true
+
+func colher_canteiro(bonus_mochila: bool = true) -> int:
+	if not construida or not is_canteiro or not canteiro_plantado or progresso_cultivo < 100.0:
+		return 0
+	var qtd = 5 if (bonus_mochila and Global.tem_mochila_couro) else 4
+	canteiro_plantado = false
+	progresso_cultivo = 0.0
+	set_process(false)
+	_atualizar_visual_cultivo()
+	AudioManager.tocar("coleta")
+	return qtd
+
+func curtir_material() -> bool:
+	if not construida or not is_curtume:
+		return false
+	if Global.carne_crua >= 2:
+		Global.carne_crua -= 2
+		Global.couro += 1
+		AudioManager.tocar("coleta")
+		print("🧵 Couro curtido! -2 Carne Crua | +1 Couro")
+		return true
+	elif Global.couro >= 1:
+		Global.couro -= 1
+		Global.gravetos += 4
+		AudioManager.tocar("coleta")
+		print("🧵 Couro cortado em tiras! -1 Couro | +4 Gravetos")
+		return true
+	print("Precisa de 2 Carnes Cruas ou 1 Couro para usar o Curtume!")
+	return false

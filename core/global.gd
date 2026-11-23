@@ -16,6 +16,8 @@ var estradas_pos: Dictionary = {}
 var baus_ativos: Array[Node3D] = []
 var fogueiras_ativas: Array[Node3D] = []
 var camas_ativas: Array[Node3D] = []
+var canteiros_ativos: Array[Node3D] = []
+var pocos_ativos: Array[Node3D] = []
 var estoque_total_baus: Dictionary = {"madeira": 0, "pedra": 0, "gravetos": 0, "pedrinhas": 0, "comida": 0, "frutas": 0}
 
 # SobrevivÃªncia do Jogador
@@ -28,13 +30,19 @@ var _timer_metabolismo: float = 0.0
 
 # Ferramentas e Equipamentos
 var tem_machado_pedra: bool = false
+var tier_machado: int = 0
+var tier_picareta: int = 0
+var tier_lanca: int = 0
+var equipe_ferramentas: bool = false
+var equipe_mochilas: bool = false
 var tem_mochila_couro: bool = false
 var usando_joystick: bool = false
 
 # Tempo e Clima
 var hora_do_dia: float = 8.0
+var dia_atual: int = 1
 const VELOCIDADE_TEMPO: float = 0.25
-enum Clima { ENSOLARADO, NUBLADO, CHUVA }
+enum Clima { ENSOLARADO, NUBLADO, CHUVA, TEMPESTADE }
 var clima_atual: Clima = Clima.ENSOLARADO
 var _tempo_proximo_clima: float = 45.0
 
@@ -115,12 +123,13 @@ func esta_de_noite() -> bool:
 	return hora_do_dia >= 20.0 or hora_do_dia < 6.0
 
 func esta_chovendo() -> bool:
-	return clima_atual == Clima.CHUVA
+	return clima_atual == Clima.CHUVA or clima_atual == Clima.TEMPESTADE
 
 func obter_texto_clima() -> String:
 	match clima_atual:
 		Clima.ENSOLARADO: return "â˜€ï¸ Sol"
 		Clima.NUBLADO: return "â›… Nublado"
+		Clima.TEMPESTADE: return "⛈ Tempestade"
 		Clima.CHUVA: return "ðŸŒ§ï¸ Chuva"
 	return "â˜€ï¸ Sol"
 
@@ -213,8 +222,10 @@ func iniciar_novo_jogo():
 	baus_ativos.clear()
 	fogueiras_ativas.clear()
 	camas_ativas.clear()
+	canteiros_ativos.clear()
+	pocos_ativos.clear()
 	estoque_total_baus = {"madeira": 0, "pedra": 0, "gravetos": 0, "pedrinhas": 0, "comida": 0, "frutas": 0}
-	hora_do_dia = 8.0
+	hora_do_dia = 8.0; dia_atual = 1
 	clima_atual = Clima.ENSOLARADO
 	tem_machado_pedra = false
 	tem_mochila_couro = false
@@ -271,3 +282,55 @@ func beber_agua_jogador() -> bool:
 	hidratacao_jogador = min(100.0, hidratacao_jogador + 45.0)
 	print("ðŸ’§ Ãgua consumida! HidrataÃ§Ã£o: ", int(hidratacao_jogador), "%")
 	return true
+
+func melhorar_machado() -> bool:
+	if tier_machado == 0 and gravetos >= 3 and pedrinhas >= 2:
+		gravetos -= 3; pedrinhas -= 2
+		tier_machado = 1; tem_machado_pedra = true
+		return true
+	elif tier_machado == 1 and madeira >= 6 and pedra >= 4 and couro >= 2:
+		madeira -= 6; pedra -= 4; couro -= 2
+		tier_machado = 2; tem_machado_pedra = true
+		return true
+	return false
+
+func melhorar_picareta() -> bool:
+	if tier_picareta == 0 and gravetos >= 3 and pedrinhas >= 3:
+		gravetos -= 3; pedrinhas -= 3
+		tier_picareta = 1
+		return true
+	elif tier_picareta == 1 and madeira >= 6 and pedra >= 6 and couro >= 2:
+		madeira -= 6; pedra -= 6; couro -= 2
+		tier_picareta = 2
+		return true
+	return false
+
+func melhorar_lanca() -> bool:
+	if tier_lanca == 0 and gravetos >= 4 and couro >= 1:
+		gravetos -= 4; couro -= 1
+		tier_lanca = 1
+		return true
+	elif tier_lanca == 1 and madeira >= 4 and pedrinhas >= 3 and couro >= 2:
+		madeira -= 4; pedrinhas -= 3; couro -= 2
+		tier_lanca = 2
+		return true
+	return false
+
+func forjar_ferramentas_equipe() -> bool:
+	if not equipe_ferramentas and madeira >= 8 and pedra >= 6 and couro >= 2:
+		madeira -= 8; pedra -= 6; couro -= 2
+		equipe_ferramentas = true
+		AudioManager.tocar("construir")
+		return true
+	return false
+
+func forjar_mochilas_equipe() -> bool:
+	if not equipe_mochilas and couro >= 6 and gravetos >= 6:
+		couro -= 6; gravetos -= 6
+		equipe_mochilas = true
+		AudioManager.tocar("construir")
+		return true
+	return false
+
+func is_noite_de_horda() -> bool:
+	return esta_de_noite() and dia_atual >= 3 and (dia_atual % 3 == 0)

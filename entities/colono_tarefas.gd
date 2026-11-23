@@ -27,6 +27,8 @@ var alvo_arbusto: Node3D:
 	get: return alvo_atual if tipo_alvo == "arbusto" else null
 var alvo_pedra: Node3D:
 	get: return alvo_atual if tipo_alvo == "pedra" else null
+var alvo_canteiro: Node3D:
+	get: return alvo_atual if (tipo_alvo == "colher_canteiro" or tipo_alvo == "plantar_canteiro") else null
 var alvo_coletavel: Node3D:
 	get: return alvo_atual if tipo_alvo == "coletavel" else null
 
@@ -59,6 +61,20 @@ func escolher_proxima_tarefa() -> Vector3:
 		else:
 			# Fallback: se nÃ£o hÃ¡ baÃºs construÃ­dos ou todos estÃ£o cheios, entrega no estoque global
 			_descarregar_mochila_no_global()
+
+	# 2.5 Canteiros agricolas (colher maduros ou plantar vazios)
+	var cant_maduro = _buscar_mais_proximo(Global.canteiros_ativos, func(c): return c.construida and c.canteiro_plantado and c.progresso_cultivo >= 100.0 and not c.reservado_colono)
+	if cant_maduro:
+		_definir_alvo(cant_maduro, "colher_canteiro")
+		cant_maduro.reservado_colono = true
+		return cant_maduro.global_position
+
+	if (Global.frutas + int(Global.estoque_total_baus.get("frutas", 0))) > 0:
+		var cant_vazio = _buscar_mais_proximo(Global.canteiros_ativos, func(c): return c.construida and not c.canteiro_plantado and not c.reservado_colono)
+		if cant_vazio:
+			_definir_alvo(cant_vazio, "plantar_canteiro")
+			cant_vazio.reservado_colono = true
+			return cant_vazio.global_position
 
 	# 3. Comida e Frutas (arbustos marcados)
 	var arbusto = _buscar_mais_proximo("recursos_marcados", func(a): return a.is_in_group("arbustos") and a.tem_frutas and not a.reservado)
@@ -127,6 +143,16 @@ func concluir_trabalho(fator_distancia: float):
 				Global.pedra = antes
 				colono.mochila["pedra"] += ganho
 				colono.energia -= 10.0 * fator_distancia * mult_chuva
+			"colher_canteiro":
+				var colhidas = alvo_atual.colher_canteiro(false)
+				alvo_atual.reservado_colono = false
+				colono.mochila["frutas"] += colhidas
+				colono.energia -= 3.0 * fator_distancia * mult_chuva
+				alvo_atual.plantar_canteiro()
+			"plantar_canteiro":
+				alvo_atual.reservado_colono = false
+				alvo_atual.plantar_canteiro()
+				colono.energia -= 2.5 * fator_distancia * mult_chuva
 			"arbusto":
 				var antes = Global.frutas
 				alvo_atual.colher()
@@ -167,6 +193,7 @@ func _descarregar_mochila_no_global():
 
 func cancelar_e_ignorar_atual():
 	if is_instance_valid(alvo_atual):
+		if "reservado_colono" in alvo_atual: alvo_atual.reservado_colono = false
 		if "reservado" in alvo_atual:
 			alvo_atual.reservado = false
 		if tipo_alvo == "cama" and "ocupada" in alvo_atual:

@@ -72,7 +72,7 @@ func gerar_mundo_completo():
 	var qtd_gravetos = max(10, int(area / 260.0))  # ~265 gravetos
 	var qtd_pedrinhas = max(10, int(area / 280.0)) # ~240 pedrinhas
 	
-	print("?? Gerando Mundo Procedural -> ï¿½rvores:", qtd_arvores, " | Rochas:", qtd_rochas, " | Arbustos:", qtd_arbustos)
+	print("🌲 Gerando Mundo Procedural -> Árvores:", qtd_arvores, " | Rochas:", qtd_rochas, " | Arbustos:", qtd_arbustos)
 	
 	_espalhar(cena_arvore, qtd_arvores, raio, 4.0, posicoes_ocupadas, true, 145.0, true)
 	_espalhar(cena_rocha, qtd_rochas, raio, 3.0, posicoes_ocupadas, true, 95.0, false)
@@ -182,7 +182,7 @@ func _process(delta):
 	if Global.esta_de_noite():
 		_timer_inimigos -= delta
 		if _timer_inimigos <= 0.0:
-			_timer_inimigos = 14.0
+			_timer_inimigos = 3.5 if Global.is_noite_de_horda() else 14.0
 			_spawnar_inimigo_noturno()
 
 func _spawnar_fauna():
@@ -219,4 +219,4 @@ func _spawnar_inimigo_noturno():
 	var inst = cena_inimigo.instantiate()
 	get_tree().current_scene.add_child(inst)
 	inst.global_position = Vector3(px, _obter_altura_chao(px, pz) + 0.5, pz)
-	print("?? Uma criatura surgiu na escuridï¿½o da floresta!")
+	print("🌙 Uma criatura surgiu na escuridão da floresta!")
