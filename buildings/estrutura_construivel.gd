@@ -172,7 +172,8 @@ func construir() -> bool:
 		$AreaInteracao.queue_free()
 		
 	AudioManager.tocar("construir")
-Global.atualizar_navmesh_otimizado()
+	_configurar_obstaculo_navegacao()
+	Global.atualizar_navmesh_otimizado()
 	return true
 
 
@@ -282,7 +283,7 @@ func receber_dano_estrutura(dano: int):
 	
 	if vida_atual <= 0:
 		print("?? Estrutura destruï¿½da pelos inimigos!")
-	Global.atualizar_navmesh_otimizado()
+		Global.atualizar_navmesh_otimizado()
 		queue_free()
 
 func reparar() -> bool:
