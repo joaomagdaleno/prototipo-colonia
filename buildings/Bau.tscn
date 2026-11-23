@@ -1,0 +1,40 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://buildings/estrutura_construivel.gd" id="1_8hkeh"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_bau"]
+size = Vector3(1.2, 0.8, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bau"]
+albedo_color = Color(0.45, 0.28, 0.14, 1)
+roughness = 0.85
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bau"]
+size = Vector3(1.2, 0.8, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_interacao"]
+size = Vector3(2.0, 1.2, 2.0)
+
+[node name="Bau" type="Node3D" unique_id=892341011 groups=["baus"]]
+script = ExtResource("1_8hkeh")
+custo_madeira = 10
+custo_gravetos = 4
+is_bau = true
+modo_macro = false
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1880862929]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+mesh = SubResource("BoxMesh_bau")
+surface_material_override/0 = SubResource("StandardMaterial3D_bau")
+
+[node name="CorpoFisico" type="StaticBody3D" parent="." unique_id=1569981504]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CorpoFisico" unique_id=1372314682]
+shape = SubResource("BoxShape3D_bau")
+
+[node name="AreaInteracao" type="Area3D" parent="." unique_id=1115549272]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AreaInteracao" unique_id=952592792]
+shape = SubResource("BoxShape3D_interacao")

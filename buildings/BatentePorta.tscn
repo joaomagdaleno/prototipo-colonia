@@ -1,0 +1,53 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://buildings/estrutura_construivel.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mad"]
+albedo_color = Color(0.45, 0.28, 0.14, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_col"]
+material = SubResource("StandardMaterial3D_mad")
+size = Vector3(0.15, 2.0, 0.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_viga"]
+material = SubResource("StandardMaterial3D_mad")
+size = Vector3(1.0, 0.4, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_col"]
+size = Vector3(0.15, 2.0, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_area"]
+size = Vector3(1.0, 2.4, 0.3)
+
+[node name="BatentePorta" type="Node3D" groups=["batentes", "paredes"]]
+script = ExtResource("1_script")
+custo_madeira = 4
+is_parede = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.425, 1, 0)
+mesh = SubResource("BoxMesh_col")
+
+[node name="ColunaDir" type="MeshInstance3D" parent="MeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.85, 0, 0)
+mesh = SubResource("BoxMesh_col")
+
+[node name="VigaTopo" type="MeshInstance3D" parent="MeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.425, 1.2, 0)
+mesh = SubResource("BoxMesh_viga")
+
+[node name="CorpoFisico" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CorpoFisico"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.425, 1, 0)
+shape = SubResource("BoxShape3D_col")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="CorpoFisico"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.425, 1, 0)
+shape = SubResource("BoxShape3D_col")
+
+[node name="AreaInteracao" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AreaInteracao"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+shape = SubResource("BoxShape3D_area")

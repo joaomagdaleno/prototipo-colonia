@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://entities/item_coletavel.gd" id="1_k5381"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_w05dh"]
+top_radius = 0.1
+bottom_radius = 0.1
+height = 0.9
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_nrtj6"]
+height = 0.9
+
+[node name="Graveto" type="StaticBody3D" unique_id=2075881]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+script = ExtResource("1_k5381")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1202854475]
+mesh = SubResource("CylinderMesh_w05dh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=685016550]
+shape = SubResource("CylinderShape3D_nrtj6")

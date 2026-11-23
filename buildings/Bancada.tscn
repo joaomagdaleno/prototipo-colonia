@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://buildings/estrutura_construivel.gd" id="1_kk8mn"]
+[ext_resource type="PackedScene" path="res://entities/Colono.tscn" id="2_bigg3"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_m7c1q"]
+size = Vector3(2, 1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_m7c1q"]
+size = Vector3(2, 1, 1)
+
+[node name="Bancada" type="StaticBody3D" unique_id=1033545960]
+script = ExtResource("1_kk8mn")
+custo_madeira = 20
+is_bancada = true
+modo_macro = false
+cena_colono = ExtResource("2_bigg3")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1402144770]
+mesh = SubResource("BoxMesh_m7c1q")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=700717792]
+shape = SubResource("BoxShape3D_m7c1q")

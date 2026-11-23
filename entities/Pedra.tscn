@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://entities/pedra.gd" id="1_uqrgu"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_nrtj6"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m7c1q"]
+albedo_color = Color(0.49803922, 0.49803922, 0.49803922, 1)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_nrtj6"]
+radius = 0.8
+
+[node name="Pedra" type="StaticBody3D" unique_id=283435172]
+script = ExtResource("1_uqrgu")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=526455213]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 0, 0, 0)
+mesh = SubResource("SphereMesh_nrtj6")
+surface_material_override/0 = SubResource("StandardMaterial3D_m7c1q")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=145205721]
+shape = SubResource("SphereShape3D_nrtj6")
+
+[node name="NavigationObstacle3D" type="NavigationObstacle3D" parent="." unique_id=527565007]
+radius = 0.9

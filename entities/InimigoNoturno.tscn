@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://entities/inimigo_noturno.gd" id="1_7eyli"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_nrtj6"]
+height = 1.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m7c1q"]
+albedo_color = Color(0.72623205, 0.042163726, 0.042163726, 1)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_pecf4"]
+radius = 0.45
+height = 1.4
+
+[node name="InimigoNoturno" type="CharacterBody3D" unique_id=1112846730]
+script = ExtResource("1_7eyli")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1629979584]
+mesh = SubResource("CapsuleMesh_nrtj6")
+surface_material_override/0 = SubResource("StandardMaterial3D_m7c1q")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1378392983]
+shape = SubResource("CapsuleShape3D_pecf4")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1708192831]
+path_desired_distance = 0.6
+target_desired_distance = 0.8

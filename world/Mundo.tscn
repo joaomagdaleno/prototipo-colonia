@@ -1,0 +1,86 @@
+[gd_scene format=3 uid="uid://ddhy33boyjlsg"]
+
+[ext_resource type="PackedScene" path="res://player/Jogador.tscn" id="1_syf7j"]
+[ext_resource type="PackedScene" path="res://player/CameraAerea.tscn" id="2_1pedo"]
+[ext_resource type="Script" uid="uid://bkgdis6ydvi0a" path="res://world/sol.gd" id="3_w05dh"]
+[ext_resource type="NavigationMesh" uid="uid://bc5nfcq82x3by" path="res://world/nav_mundo.tres" id="4_7dq3s"]
+[ext_resource type="PackedScene" uid="uid://dqob0xyfw2k5s" path="res://ui/HUD.tscn" id="5_vblcf"]
+[ext_resource type="Script" uid="uid://djn6ss4gfnrv4" path="res://world/clima_visual.gd" id="6_hk8x4"]
+[ext_resource type="Script" uid="uid://bbh4iv5ymtx2c" path="res://world/gerador_mundo.gd" id="7_bi0k3"]
+[ext_resource type="PackedScene" uid="uid://8n2c2rg6l650" path="res://entities/Arvore.tscn" id="8_jn82q"]
+[ext_resource type="PackedScene" path="res://entities/Pedra.tscn" id="9_ws3pl"]
+[ext_resource type="PackedScene" uid="uid://b3uf08iy6s8b7" path="res://entities/Arbusto.tscn" id="10_ak346"]
+[ext_resource type="PackedScene" path="res://entities/Graveto.tscn" id="11_gi3ff"]
+[ext_resource type="PackedScene" path="res://entities/Pedrinha.tscn" id="12_jrtib"]
+[ext_resource type="PackedScene" path="res://entities/Animal.tscn" id="13_rq12r"]
+[ext_resource type="PackedScene" path="res://entities/InimigoNoturno.tscn" id="14_jx5eo"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_pecf4"]
+
+[sub_resource type="Sky" id="Sky_m7c1q"]
+sky_material = SubResource("ProceduralSkyMaterial_pecf4")
+
+[sub_resource type="Environment" id="Environment_nrtj6"]
+background_mode = 2
+sky = SubResource("Sky_m7c1q")
+ambient_light_source = 3
+tonemap_mode = 2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4arys"]
+albedo_color = Color(0.23137255, 0.36862746, 0.16862746, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_nrtj6"]
+size = Vector3(250, 1, 250)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nrtj6"]
+size = Vector3(250, 1, 250)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pecf4"]
+size = Vector3(250, 1, 250)
+
+[node name="Mundo" type="Node3D" unique_id=566558772]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1573876509]
+environment = SubResource("Environment_nrtj6")
+
+[node name="Chao" type="StaticBody3D" parent="." unique_id=59568399 groups=["navegavel"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Chao" unique_id=771092469]
+material_override = SubResource("StandardMaterial3D_4arys")
+mesh = SubResource("BoxMesh_nrtj6")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Chao" unique_id=174921242]
+shape = SubResource("BoxShape3D_nrtj6")
+
+[node name="Jogador" parent="." unique_id=1109626013 instance=ExtResource("1_syf7j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="CameraAerea" parent="." unique_id=1504099785 instance=ExtResource("2_1pedo")]
+transform = Transform3D(1, 0, 0, 0, 0.49999997, 0.86602545, 0, -0.86602545, 0.49999997, 0, 15, 10)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=980109354]
+transform = Transform3D(0.70710677, 0.49999997, -0.49999997, 0, 0.70710677, 0.70710677, 0.70710677, -0.49999997, 0.49999997, 0, 0, 0)
+script = ExtResource("3_w05dh")
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=519888196 groups=["navegavel"]]
+navigation_mesh = ExtResource("4_7dq3s")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D" unique_id=95232936 groups=["navegavel"]]
+visible = false
+mesh = SubResource("BoxMesh_pecf4")
+
+[node name="HUD" parent="." unique_id=1074041764 instance=ExtResource("5_vblcf")]
+
+[node name="ClimaVisual" type="Node3D" parent="." unique_id=26339237]
+script = ExtResource("6_hk8x4")
+
+[node name="GeradorMundo" type="Node3D" parent="." unique_id=1449296994]
+script = ExtResource("7_bi0k3")
+cena_arvore = ExtResource("8_jn82q")
+cena_rocha = ExtResource("9_ws3pl")
+cena_arbusto = ExtResource("10_ak346")
+cena_graveto = ExtResource("11_gi3ff")
+cena_pedrinha = ExtResource("12_jrtib")
+cena_animal = ExtResource("13_rq12r")
+cena_inimigo = ExtResource("14_jx5eo")

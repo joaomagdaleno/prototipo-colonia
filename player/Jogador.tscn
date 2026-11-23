@@ -1,0 +1,40 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://player/jogador.gd" id="1_kq47h"]
+[ext_resource type="PackedScene" path="res://buildings/Piso.tscn" id="2_c50up"]
+[ext_resource type="PackedScene" path="res://buildings/Bancada.tscn" id="3_axq18"]
+[ext_resource type="PackedScene" path="res://buildings/Cama.tscn" id="4_eic1p"]
+[ext_resource type="PackedScene" path="res://buildings/Fogueira.tscn" id="5_lwnij"]
+[ext_resource type="Script" path="res://player/jogador_interacao.gd" id="6_axq18"]
+[ext_resource type="Script" path="res://player/jogador_mobilia.gd" id="7_eic1p"]
+[ext_resource type="PackedScene" path="res://buildings/MuroPedra.tscn" id="8_lwnij"]
+[ext_resource type="PackedScene" path="res://buildings/Portao.tscn" id="9_o2jep"]
+[ext_resource type="PackedScene" path="res://buildings/Bau.tscn" id="10_bau01"]
+[ext_resource type="PackedScene" path="res://buildings/ParedeMadeira.tscn" id="11_parede01"]
+[ext_resource type="PackedScene" path="res://buildings/TetoMadeira.tscn" id="12_teto01"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_nrtj6"]
+radius = 0.4
+height = 1.6
+
+[node name="Jogador" type="CharacterBody3D" unique_id=1109626013]
+script = ExtResource("1_kq47h")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=346844666]
+shape = SubResource("CapsuleShape3D_nrtj6")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1272281335]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+current = true
+
+[node name="RayCast3D" type="RayCast3D" parent="Camera3D" unique_id=1043953573]
+target_position = Vector3(0, 0, -3)
+collision_mask = 3
+collide_with_areas = true
+
+[node name="Interacao" type="Node" parent="." unique_id=438228021]
+script = ExtResource("6_axq18")
+
+[node name="Mobilia" type="Node" parent="." unique_id=1808950487]
+script = ExtResource("7_eic1p")
+opcoes_mobilia = Array[PackedScene]([ExtResource("5_lwnij"), ExtResource("10_bau01"), ExtResource("2_c50up"), ExtResource("11_parede01"), ExtResource("12_teto01"), ExtResource("3_axq18"), ExtResource("4_eic1p"), ExtResource("8_lwnij"), ExtResource("9_o2jep")])

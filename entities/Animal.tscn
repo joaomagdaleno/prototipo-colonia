@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://entities/animal.gd" id="1_l6hdp"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_nrtj6"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m7c1q"]
+albedo_color = Color(0.5105224, 0.31403157, 0.20422785, 1)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_pecf4"]
+
+[node name="Animal" type="CharacterBody3D" unique_id=1635605713]
+script = ExtResource("1_l6hdp")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1228106602]
+mesh = SubResource("CapsuleMesh_nrtj6")
+surface_material_override/0 = SubResource("StandardMaterial3D_m7c1q")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=884637134]
+shape = SubResource("SphereShape3D_pecf4")

@@ -1,0 +1,12 @@
+# Godot 4 .gitignore padrao
+.godot/
+*.translation
+
+# Logs e arquivos temporarios
+*.log
+user/
+savegame.json
+
+# Sistema operacional
+.DS_Store
+Thumbs.db

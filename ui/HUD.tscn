@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://dqob0xyfw2k5s"]
+
+[ext_resource type="Script" uid="uid://bv0qgsnfuoc55" path="res://ui/hud.gd" id="1_ifcd0"]
+[ext_resource type="Script" uid="uid://di6a0f0bpsnh4" path="res://ui/hud_inventario.gd" id="2_efote"]
+[ext_resource type="Script" uid="uid://cwsahi0g40ffe" path="res://ui/hud_pausa.gd" id="3_vow1y"]
+[ext_resource type="Script" uid="uid://n3vrhjalaiun" path="res://ui/hud_menu_construcao.gd" id="4_livrobld"]
+[ext_resource type="Script" uid="uid://6u7xl05bvy5y" path="res://ui/hud_dock.gd" id="4_pom5v"]
+
+[node name="HUD" type="CanvasLayer" unique_id=1074041764]
+script = ExtResource("1_ifcd0")
+
+[node name="InventarioUI" type="Control" parent="." unique_id=1303638059]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_efote")
+
+[node name="ConstrucaoMenuUI" type="Control" parent="." unique_id=1303638060]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_livrobld")
+
+[node name="DockUI" type="Control" parent="." unique_id=1303638061]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_pom5v")
+
+[node name="PausaUI" type="Control" parent="." unique_id=14219186]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("3_vow1y")

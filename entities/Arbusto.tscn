@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://b3uf08iy6s8b7"]
+
+[ext_resource type="Script" uid="uid://ij8p7831tpbd" path="res://entities/arbusto.gd" id="1_1dagi"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_nrtj6"]
+radius = 0.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pecf4"]
+albedo_color = Color(0.627451, 0.76862746, 0.6156863, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_m7c1q"]
+material = SubResource("StandardMaterial3D_pecf4")
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_nrtj6"]
+top_radius = 0.1
+bottom_radius = 0.1
+height = 0.8
+
+[node name="Arbusto" type="StaticBody3D" unique_id=43670065]
+script = ExtResource("1_1dagi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2024174553]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("SphereShape3D_nrtj6")
+
+[node name="Copa" type="MeshInstance3D" parent="." unique_id=296914631]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("SphereMesh_m7c1q")
+
+[node name="Tronco" type="MeshInstance3D" parent="." unique_id=1589761785]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+mesh = SubResource("CylinderMesh_nrtj6")
+
+[node name="NavigationObstacle3D" type="NavigationObstacle3D" parent="." unique_id=2132396366]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+radius = 0.5

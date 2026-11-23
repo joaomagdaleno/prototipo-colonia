@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://player/camera_aerea.gd" id="1_3dhc2"]
+[ext_resource type="PackedScene" path="res://buildings/Bloco.tscn" id="2_uxc72"]
+[ext_resource type="PackedScene" path="res://buildings/Estrada.tscn" id="3_non68"]
+[ext_resource type="PackedScene" path="res://buildings/MuroPedra.tscn" id="4_gldy0"]
+[ext_resource type="Script" path="res://player/planejador_pincel.gd" id="4_uxc72"]
+[ext_resource type="PackedScene" path="res://buildings/Portao.tscn" id="5_aebdj"]
+
+[node name="CameraAerea" type="Camera3D" unique_id=1504099785]
+transform = Transform3D(1, 0, 0, 0, 0.49999997, 0.86602545, 0, -0.86602545, 0.49999997, 0, 0, 0)
+script = ExtResource("1_3dhc2")
+opcoes_construcao = Array[PackedScene]([ExtResource("2_uxc72"), ExtResource("3_non68"), ExtResource("4_gldy0"), ExtResource("5_aebdj")])
+
+[node name="Pincel" type="Node" parent="." unique_id=1533330921]
+script = ExtResource("4_uxc72")

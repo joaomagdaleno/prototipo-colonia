@@ -1,0 +1,41 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://buildings/estrutura_construivel.gd" id="1_vtkr7"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_nrtj6"]
+size = Vector3(1, 2, 0.25)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m7c1q"]
+albedo_color = Color(0.52104485, 0.25422865, 0, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nrtj6"]
+size = Vector3(1, 2, 0.25)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_m7c1q"]
+
+[node name="Portao" type="Node3D" unique_id=413760013]
+script = ExtResource("1_vtkr7")
+custo_madeira = 6
+custo_pedra = 2
+modo_macro = false
+is_portao = true
+vida_maxima = 80
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1880862928]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0)
+mesh = SubResource("BoxMesh_nrtj6")
+surface_material_override/0 = SubResource("StandardMaterial3D_m7c1q")
+
+[node name="CorpoFisico" type="StaticBody3D" parent="." unique_id=1569981503]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CorpoFisico" unique_id=1372314681]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0)
+shape = SubResource("BoxShape3D_nrtj6")
+
+[node name="AreaInteracao" type="Area3D" parent="." unique_id=1115549271]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AreaInteracao" unique_id=952592791]
+shape = SubResource("BoxShape3D_m7c1q")
+
+[node name="NavigationObstacle3D" type="NavigationObstacle3D" parent="." unique_id=1777675803]
+radius = 0.8

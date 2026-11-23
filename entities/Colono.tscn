@@ -1,0 +1,28 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://entities/colono.gd" id="1_4hsv8"]
+[ext_resource type="Script" path="res://entities/colono_tarefas.gd" id="2_pfa7t"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_nrtj6"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m7c1q"]
+albedo_color = Color(0, 1, 0, 1)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_nrtj6"]
+radius = 0.4
+height = 1.8
+
+[node name="Colono" type="CharacterBody3D" unique_id=356347424]
+script = ExtResource("1_4hsv8")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=67685419]
+mesh = SubResource("CapsuleMesh_nrtj6")
+surface_material_override/0 = SubResource("StandardMaterial3D_m7c1q")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=142408825]
+shape = SubResource("CapsuleShape3D_nrtj6")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1906180064]
+
+[node name="Tarefas" type="Node" parent="." unique_id=1171596933]
+script = ExtResource("2_pfa7t")
