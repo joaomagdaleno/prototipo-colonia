@@ -40,6 +40,7 @@ func _ready():
 	agent.target_desired_distance = 0.5
 	agent.avoidance_enabled = true
 	agent.radius = 0.4
+	agent.velocity_computed.connect(_on_velocity_computed)
 	_otimizar_renderizacao_vega8()
 	posicao_anterior = global_position
 
@@ -127,13 +128,11 @@ func _physics_process(delta):
 	if direcao.length() > 0.1:
 		direcao = direcao.normalized()
 		var vel = _calcular_velocidade_atual()
-		velocity.x = direcao.x * vel
-		velocity.z = direcao.z * vel
 		rotation.y = lerp_angle(rotation.y, atan2(direcao.x, direcao.z), 0.1)
+		agent.set_velocity(Vector3(direcao.x * vel, velocity.y, direcao.z * vel))
 	else:
 		velocity.x = 0; velocity.z = 0
-
-	move_and_slide()
+		move_and_slide()
 
 	if global_position.distance_to(posicao_anterior) < 0.05 and dist > 1.8:
 		tempo_preso += delta
@@ -200,3 +199,8 @@ func _otimizar_renderizacao_vega8():
 			filho.visibility_range_end = 95.0
 			filho.visibility_range_end_margin = 5.0
 			filho.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_DISABLED
+
+func _on_velocity_computed(safe_velocity: Vector3):
+	velocity.x = safe_velocity.x
+	velocity.z = safe_velocity.z
+	move_and_slide()

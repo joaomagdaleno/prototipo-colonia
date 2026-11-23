@@ -172,8 +172,7 @@ func construir() -> bool:
 		$AreaInteracao.queue_free()
 		
 	AudioManager.tocar("construir")
-	_configurar_obstaculo_navegacao()
-	Global.atualizar_navmesh_otimizado()
+Global.atualizar_navmesh_otimizado()
 	return true
 
 
@@ -211,18 +210,17 @@ func cozinhar() -> bool:
 
 func demolir():
 	if is_bancada:
-		print("A Bancada principal nÃ£o pode ser demolida!")
+		print("A Bancada principal não pode ser demolida!")
 		return
-		
+
 	if is_in_group("estradas"):
 		Global.estradas_pos.erase(coordenada_grade)
+
 	if construida:
 		Global.madeira += int(custo_madeira / 2.0)
 		Global.pedra += int(custo_pedra / 2.0)
 		Global.gravetos += int(custo_gravetos / 2.0)
 		Global.pedrinhas += int(custo_pedrinhas / 2.0)
-		
-		# Se for um BaÃº, devolve 100% dos itens que estavam guardados nele
 		if is_bau:
 			Global.baus_ativos.erase(self)
 			for tipo in estoque_bau.keys():
@@ -231,31 +229,13 @@ func demolir():
 					Global.set(tipo, int(Global.get(tipo)) + qtd_guardada)
 					Global.estoque_total_baus[tipo] = max(0, int(Global.estoque_total_baus.get(tipo, 0)) - qtd_guardada)
 					estoque_bau[tipo] = 0
-			print("ðŸ“¦ BaÃº demolido! Todos os itens guardados + materiais devolvidos.")
+			print("Baú demolido! Todos os itens guardados + materiais devolvidos.")
 		else:
 			print("Estrutura demolida! Metade dos recursos devolvida.")
-			
-		_configurar_obstaculo_navegacao()
-	Global.atualizar_navmesh_otimizado()
+		Global.atualizar_navmesh_otimizado()
 	else:
 		print("Projeto cancelado: ", name)
-		
-	queue_free()
 
-		
-	if is_in_group("estradas"):
-		Global.estradas_pos.erase(coordenada_grade)
-	if construida:
-		Global.madeira += int(custo_madeira / 2.0)
-		Global.pedra += int(custo_pedra / 2.0)
-		Global.gravetos += int(custo_gravetos / 2.0)
-		Global.pedrinhas += int(custo_pedrinhas / 2.0)
-		print("Estrutura demolida! Metade dos recursos devolvida.")
-		_configurar_obstaculo_navegacao()
-	Global.atualizar_navmesh_otimizado()
-	else:
-		print("Projeto cancelado: ", name)
-		
 	queue_free()
 
 func _process(delta):
@@ -302,7 +282,6 @@ func receber_dano_estrutura(dano: int):
 	
 	if vida_atual <= 0:
 		print("?? Estrutura destruï¿½da pelos inimigos!")
-		_configurar_obstaculo_navegacao()
 	Global.atualizar_navmesh_otimizado()
 		queue_free()
 

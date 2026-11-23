@@ -27,6 +27,7 @@ func _ready():
 	if is_instance_valid(agent):
 		agent.avoidance_enabled = true
 		agent.radius = 0.45
+		agent.velocity_computed.connect(_on_velocity_computed)
 	_timer_repensar_caminho = randf_range(0.05, 0.35)
 	_otimizar_renderizacao_vega8()
 
@@ -128,9 +129,12 @@ func _executar_perseguicao(delta: float):
 
 	if dir.length() > 0.1:
 		dir = dir.normalized()
+		rotation.y = lerp_angle(rotation.y, atan2(dir.x, dir.z), 0.15)
+		if is_instance_valid(agent):
+			agent.set_velocity(Vector3(dir.x * velocidade, velocity.y, dir.z * velocidade))
+			return
 		velocity.x = dir.x * velocidade
 		velocity.z = dir.z * velocidade
-		rotation.y = lerp_angle(rotation.y, atan2(dir.x, dir.z), 0.15)
 	else:
 		velocity.x = 0; velocity.z = 0
 
@@ -181,3 +185,8 @@ func receber_dano(dano: int):
 		Global.couro += 2
 		print("?? Criatura noturna derrotada! +2 Couro")
 		queue_free()
+
+func _on_velocity_computed(safe_velocity: Vector3):
+	velocity.x = safe_velocity.x
+	velocity.z = safe_velocity.z
+	move_and_slide()
