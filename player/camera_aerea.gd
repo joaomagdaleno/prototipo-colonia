@@ -14,6 +14,8 @@ var usando_controle: bool = false
 var ultima_pos_pintada: Vector3 = Vector3(9999, 9999, 9999)
 var _forma_demolir: SphereShape3D
 var _forma_livre: SphereShape3D
+var _ultima_celula_verificada: Vector2i = Vector2i(99999, 99999)
+var _ultimo_resultado_livre: bool = true
 
 const LIMITE_MAPA_XZ := 105.0
 const ALTURA_MIN_ZOOM := 10.0
@@ -124,9 +126,14 @@ func _process(delta):
 		ultima_pos_pintada = Vector3(9999, 9999, 9999)
 
 func _posicao_esta_livre(pos: Vector3) -> bool:
-	# 1. Checagem O(1) para estradas (que nao possuem colisor fisico)
 	var celula = Vector2i(int(round(pos.x)), int(round(pos.z)))
+	if celula == _ultima_celula_verificada:
+		return _ultimo_resultado_livre
+	_ultima_celula_verificada = celula
+
+	# 1. Checagem O(1) para estradas (que nao possuem colisor fisico)
 	if Global.estradas_pos.has(celula):
+		_ultimo_resultado_livre = false
 		return false
 
 	# 2. Consulta espacial nativa C++ (BVH) para arvores, projetos e construcoes
@@ -142,7 +149,9 @@ func _posicao_esta_livre(pos: Vector3) -> bool:
 		if not is_instance_valid(col): continue
 		var alvo = col if (col.is_in_group("projetos") or col.is_in_group("construidos") or col.is_in_group("arvores")) else col.get_parent()
 		if is_instance_valid(alvo) and alvo != fantasma and (alvo.is_in_group("projetos") or alvo.is_in_group("construidos") or alvo.is_in_group("arvores")):
+			_ultimo_resultado_livre = false
 			return false
+	_ultimo_resultado_livre = true
 	return true
 
 func _atualizar_cor_fantasma(livre: bool):
@@ -159,6 +168,7 @@ func _atualizar_cor_fantasma(livre: bool):
 
 func _tentar_colocar_projeto(pos: Vector3):
 	ultima_pos_pintada = pos
+	_ultima_celula_verificada = Vector2i(99999, 99999)
 	if not _posicao_esta_livre(pos) or opcoes_construcao.is_empty(): return
 	var cena = opcoes_construcao[indice_atual]
 	var novo = cena.instantiate()
@@ -175,6 +185,7 @@ func _tentar_demolir_na_posicao(pos: Vector3):
 		var est_rua = Global.estradas_pos[celula]
 		if is_instance_valid(est_rua) and est_rua is Node3D and est_rua.has_method("demolir"):
 			est_rua.demolir()
+			_ultima_celula_verificada = Vector2i(99999, 99999)
 			return
 
 	# 2. Consulta espacial nativa C++ (BVH) para projetos e construcoes com colisor
@@ -191,6 +202,7 @@ func _tentar_demolir_na_posicao(pos: Vector3):
 		var alvo = col if col.has_method("demolir") else col.get_parent()
 		if is_instance_valid(alvo) and alvo != fantasma and (alvo.is_in_group("projetos") or alvo.is_in_group("construidos")):
 			alvo.demolir()
+			_ultima_celula_verificada = Vector2i(99999, 99999)
 			return
 
 func _unhandled_input(event):

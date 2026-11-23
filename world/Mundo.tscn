@@ -23,8 +23,10 @@ sky_material = SubResource("ProceduralSkyMaterial_pecf4")
 [sub_resource type="Environment" id="Environment_nrtj6"]
 background_mode = 2
 sky = SubResource("Sky_m7c1q")
-ambient_light_source = 3
-tonemap_mode = 2
+ambient_light_source = 2
+ambient_light_color = Color(0.55, 0.62, 0.72, 1)
+ambient_light_energy = 0.65
+tonemap_mode = 0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4arys"]
 albedo_color = Color(0.23137255, 0.36862746, 0.16862746, 1)

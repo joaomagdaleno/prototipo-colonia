@@ -12,7 +12,7 @@ config_version=5
 
 config/name="prototipo"
 run/main_scene="res://ui/MenuPrincipal.tscn"
-config/features=PackedStringArray("4.7", "Forward Plus")
+config/features=PackedStringArray("4.7", "Mobile")
 config/icon="res://icon.svg"
 
 [autoload]
@@ -29,10 +29,10 @@ window/stretch/aspect="expand"
 
 [input_devices]
 
-sensors/enable_accelerometer=true
-sensors/enable_gravity=true
-sensors/enable_gyroscope=true
-sensors/enable_magnetometer=true
+sensors/enable_accelerometer=false
+sensors/enable_gravity=false
+sensors/enable_gyroscope=false
+sensors/enable_magnetometer=false
 
 [physics]
 
@@ -40,6 +40,6 @@ sensors/enable_magnetometer=true
 
 [rendering]
 
-rendering_device/driver.windows="d3d12"
-scaling_3d/mode=2
-scaling_3d/scale=0.5
+rendering_device/driver.windows="vulkan"
+scaling_3d/mode=0
+scaling_3d/scale=1.0
