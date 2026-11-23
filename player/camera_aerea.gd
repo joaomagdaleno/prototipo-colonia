@@ -13,6 +13,7 @@ var velocidade_movimento := 18.0
 var usando_controle: bool = false
 var ultima_pos_pintada: Vector3 = Vector3(9999, 9999, 9999)
 var _forma_demolir: SphereShape3D
+var _forma_livre: SphereShape3D
 
 const LIMITE_MAPA_XZ := 105.0
 const ALTURA_MIN_ZOOM := 10.0
@@ -27,6 +28,8 @@ func _ready():
 	add_to_group("camera_aerea")
 	_forma_demolir = SphereShape3D.new()
 	_forma_demolir.radius = 0.45
+	_forma_livre = SphereShape3D.new()
+	_forma_livre.radius = 0.4
 	far = 220.0
 
 	oceano_visual = GradeOceanoVisual.criar_oceano()
@@ -121,13 +124,25 @@ func _process(delta):
 		ultima_pos_pintada = Vector3(9999, 9999, 9999)
 
 func _posicao_esta_livre(pos: Vector3) -> bool:
-	for grupo in ["projetos", "construidos", "arvores"]:
-		for p in get_tree().get_nodes_in_group(grupo):
-			if p != fantasma and is_instance_valid(p):
-				var dx = p.global_position.x - pos.x
-				var dz = p.global_position.z - pos.z
-				if (dx * dx + dz * dz) < 0.64:
-					return false
+	# 1. Checagem O(1) para estradas (que nao possuem colisor fisico)
+	var celula = Vector2i(int(round(pos.x)), int(round(pos.z)))
+	if Global.estradas_pos.has(celula):
+		return false
+
+	# 2. Consulta espacial nativa C++ (BVH) para arvores, projetos e construcoes
+	var params = PhysicsShapeQueryParameters3D.new()
+	params.shape = _forma_livre
+	params.transform = Transform3D(Basis.IDENTITY, pos)
+	params.collision_mask = 3
+	params.collide_with_bodies = true
+	params.collide_with_areas = true
+	var hits = get_world_3d().direct_space_state.intersect_shape(params, 8)
+	for hit in hits:
+		var col = hit.get("collider")
+		if not is_instance_valid(col): continue
+		var alvo = col if (col.is_in_group("projetos") or col.is_in_group("construidos") or col.is_in_group("arvores")) else col.get_parent()
+		if is_instance_valid(alvo) and alvo != fantasma and (alvo.is_in_group("projetos") or alvo.is_in_group("construidos") or alvo.is_in_group("arvores")):
+			return false
 	return true
 
 func _atualizar_cor_fantasma(livre: bool):

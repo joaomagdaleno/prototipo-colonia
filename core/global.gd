@@ -14,6 +14,8 @@ var carne_crua: int = 0
 var couro: int = 0
 var estradas_pos: Dictionary = {}
 var baus_ativos: Array[Node3D] = []
+var fogueiras_ativas: Array[Node3D] = []
+var camas_ativas: Array[Node3D] = []
 var estoque_total_baus: Dictionary = {"madeira": 0, "pedra": 0, "gravetos": 0, "pedrinhas": 0, "comida": 0, "frutas": 0}
 
 # SobrevivÃªncia do Jogador
@@ -209,6 +211,8 @@ func iniciar_novo_jogo():
 	comida = 5; frutas = 0; carne_crua = 0; couro = 0
 	estradas_pos.clear()
 	baus_ativos.clear()
+	fogueiras_ativas.clear()
+	camas_ativas.clear()
 	estoque_total_baus = {"madeira": 0, "pedra": 0, "gravetos": 0, "pedrinhas": 0, "comida": 0, "frutas": 0}
 	hora_do_dia = 8.0
 	clima_atual = Clima.ENSOLARADO

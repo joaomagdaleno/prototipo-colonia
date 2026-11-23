@@ -15,6 +15,7 @@ var jogador: CharacterBody3D = null
 var _timer_fogueira: float = 0.0
 var _dir_fuga_fogo: Vector3 = Vector3.ZERO
 var _timer_repensar_caminho: float = 0.0
+var _movendo_via_rvo: bool = false
 
 const GRAVIDADE := 12.0
 
@@ -59,6 +60,7 @@ func _physics_process(delta):
 		_verificar_repulsao_fogo()
 
 	# 2. Execuï¿½ï¿½o da Mï¿½quina de Estados
+	_movendo_via_rvo = false
 	match estado_atual:
 		Estado.FUGIR_FOGO:
 			_executar_fuga(delta)
@@ -67,11 +69,12 @@ func _physics_process(delta):
 		Estado.ATACAR:
 			_executar_ataque(delta)
 
-	move_and_slide()
+	if not _movendo_via_rvo:
+		move_and_slide()
 
 func _verificar_repulsao_fogo():
 	var fugir = false
-	for est in get_tree().get_nodes_in_group("fogueiras"):
+	for est in Global.fogueiras_ativas:
 		if is_instance_valid(est) and "is_fogueira" in est and est.is_fogueira:
 			if est.luz and est.luz.visible:
 				# 36.0 = 6 metros de raio de proteï¿½ï¿½o da fogueira
@@ -94,12 +97,12 @@ func _executar_fuga(_delta: float):
 
 func _executar_perseguicao(delta: float):
 	if not is_instance_valid(jogador) or jogador.no_modo_construcao:
-		velocity.x = 0; velocity.z = 0
+		velocity.x = 0; velocity.z = 0; if is_instance_valid(agent): agent.set_velocity(Vector3.ZERO)
 		return
 
 	var dist_jogador = global_position.distance_to(jogador.global_position)
 	if dist_jogador > 28.0:
-		velocity.x = 0; velocity.z = 0
+		velocity.x = 0; velocity.z = 0; if is_instance_valid(agent): agent.set_velocity(Vector3.ZERO)
 		return
 
 	# Ataque direto ao alcance do jogador
@@ -131,16 +134,18 @@ func _executar_perseguicao(delta: float):
 		dir = dir.normalized()
 		rotation.y = lerp_angle(rotation.y, atan2(dir.x, dir.z), 0.15)
 		if is_instance_valid(agent):
+			_movendo_via_rvo = true
 			agent.set_velocity(Vector3(dir.x * velocidade, velocity.y, dir.z * velocidade))
 			return
 		velocity.x = dir.x * velocidade
 		velocity.z = dir.z * velocidade
 	else:
-		velocity.x = 0; velocity.z = 0
+		velocity.x = 0; velocity.z = 0; if is_instance_valid(agent): agent.set_velocity(Vector3.ZERO)
 
 func _executar_ataque(_delta: float):
 	velocity.x = 0
 	velocity.z = 0
+	if is_instance_valid(agent): agent.set_velocity(Vector3.ZERO)
 
 	if tempo_recarga_ataque > 0.0:
 		return
@@ -163,7 +168,7 @@ func _executar_ataque(_delta: float):
 
 func _buscar_muro_a_frente() -> EstruturaConstruivel:
 	var pos := global_position
-	for est in get_tree().get_nodes_in_group("fogueiras"):
+	for est in Global.fogueiras_ativas:
 		if is_instance_valid(est) and est is EstruturaConstruivel:
 			if est.is_muro or est.is_parede or (est.is_portao and not est.portao_aberto):
 				if pos.distance_squared_to(est.global_position) <= 3.24: # 1.8 metros

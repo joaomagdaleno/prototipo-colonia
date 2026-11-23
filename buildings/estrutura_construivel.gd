@@ -117,6 +117,10 @@ func pode_pagar() -> bool:
 func construir() -> bool:
 	if is_in_group("estradas"):
 		Global.estradas_pos.erase(coordenada_grade)
+	if is_fogueira:
+		Global.fogueiras_ativas.erase(self)
+	if is_cama:
+		Global.camas_ativas.erase(self)
 	if construida:
 		return false
 		
@@ -151,11 +155,15 @@ func construir() -> bool:
 	# Sï¿½ ativa o _process se for realmente uma fogueira pronta
 	if is_fogueira:
 		add_to_group("fogueiras")
+		if not self in Global.fogueiras_ativas:
+			Global.fogueiras_ativas.append(self)
 		if luz:
 			set_process(true)
 	
 	if is_cama:
 		add_to_group("camas")
+		if not self in Global.camas_ativas:
+			Global.camas_ativas.append(self)
 	
 	if is_bau:
 		add_to_group("baus")
@@ -217,6 +225,10 @@ func demolir():
 	if is_in_group("estradas"):
 		Global.estradas_pos.erase(coordenada_grade)
 
+	if is_fogueira:
+		Global.fogueiras_ativas.erase(self)
+	if is_cama:
+		Global.camas_ativas.erase(self)
 	if construida:
 		Global.madeira += int(custo_madeira / 2.0)
 		Global.pedra += int(custo_pedra / 2.0)

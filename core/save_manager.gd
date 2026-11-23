@@ -112,6 +112,8 @@ func carregar_jogo() -> bool:
 	Global.hidratacao_jogador = float(rec.get("hidratacao_jogador", 85.0))
 	Global.estradas_pos.clear()
 	Global.baus_ativos.clear()
+	Global.fogueiras_ativas.clear()
+	Global.camas_ativas.clear()
 	Global.estoque_total_baus = {"madeira": 0, "pedra": 0, "gravetos": 0, "pedrinhas": 0, "comida": 0, "frutas": 0}
 	
 	var jogador = get_tree().current_scene.get_node_or_null("Jogador")

@@ -54,6 +54,7 @@ func _physics_process(delta):
 
 	# 2. Estado Dormindo
 	if dormindo:
+		agent.set_velocity(Vector3.ZERO)
 		velocity.x = 0; velocity.z = 0; move_and_slide()
 		var taxa = 15.0 if is_instance_valid(tarefas.alvo_cama) else 5.0
 		energia = clamp(energia + taxa * delta, 0.0, 100.0)
@@ -71,6 +72,7 @@ func _physics_process(delta):
 
 	# 3. Executando Tarefa no Local
 	if esta_trabalhando:
+		agent.set_velocity(Vector3.ZERO)
 		tempo_trabalhando += delta
 		velocity.x = 0; velocity.z = 0; move_and_slide()
 		var alvo_atual = tarefas.obter_alvo_atual()
@@ -132,6 +134,7 @@ func _physics_process(delta):
 		agent.set_velocity(Vector3(direcao.x * vel, velocity.y, direcao.z * vel))
 	else:
 		velocity.x = 0; velocity.z = 0
+		agent.set_velocity(Vector3.ZERO)
 		move_and_slide()
 
 	if global_position.distance_to(posicao_anterior) < 0.05 and dist > 1.8:
@@ -178,8 +181,10 @@ func _calcular_velocidade_atual() -> float:
 func obter_status_texto() -> String:
 	var est = str(int(energia)) + "%"
 	var carga = obter_carga_mochila()
-	if dormindo: return "ðŸ’¤ Dormindo (" + est + ")"
+	if dormindo:
+		agent.set_velocity(Vector3.ZERO) return "ðŸ’¤ Dormindo (" + est + ")"
 	if esta_trabalhando:
+		agent.set_velocity(Vector3.ZERO)
 		if is_instance_valid(tarefas.alvo): return "ðŸ”¨ Construindo (" + est + ")"
 		if is_instance_valid(tarefas.alvo_arvore): return "ðŸª“ Cortando (" + est + ")"
 		if is_instance_valid(tarefas.alvo_pedra): return "â›ï¸ Minerando (" + est + ")"

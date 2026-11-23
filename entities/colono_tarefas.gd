@@ -207,7 +207,7 @@ func _procurar_cama_livre() -> Node3D:
 	var menor_dist_sq := INF
 	var pos_colono := colono.global_position
 
-	for c in get_tree().get_nodes_in_group("camas"):
+	for c in Global.camas_ativas:
 		if is_instance_valid(c) and c.construida and not c.ocupada and c not in alvos_ignorados:
 			var d_sq = pos_colono.distance_squared_to(c.global_position)
 			if d_sq < menor_dist_sq:
