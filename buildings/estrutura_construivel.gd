@@ -37,7 +37,7 @@ var reservado: bool = false
 var ocupada: bool = false
 
 var _protegida_chuva_cache: bool = false
-var _timer_chuva: float = 0.0
+var _timer_chuva: float = randf_range(0.1, 1.5)
 
 @onready var mesh: MeshInstance3D = $MeshInstance3D
 @onready var corpo_fisico: CollisionObject3D = get_node_or_null("CorpoFisico") if has_node("CorpoFisico") else self
@@ -93,7 +93,7 @@ func _consumir_recurso_global_ou_bau(recurso: String, qtd: int):
 		restante -= tirar_jog
 		
 	if restante > 0:
-		for bau in get_tree().get_nodes_in_group("baus"):
+		for bau in Global.baus_ativos:
 			if is_instance_valid(bau) and bau.construida and bau.has_method("retirar_item_do_bau"):
 				var tirado = bau.retirar_item_do_bau(recurso, restante)
 				restante -= tirado
@@ -152,6 +152,8 @@ func construir() -> bool:
 	
 	if is_bau:
 		add_to_group("baus")
+		if not self in Global.baus_ativos:
+			Global.baus_ativos.append(self)
 	
 	if is_parede:
 		add_to_group("paredes")
@@ -214,6 +216,7 @@ func demolir():
 		
 		# Se for um BaÃº, devolve 100% dos itens que estavam guardados nele
 		if is_bau:
+			Global.baus_ativos.erase(self)
 			for tipo in estoque_bau.keys():
 				var qtd_guardada = int(estoque_bau[tipo])
 				if qtd_guardada > 0:
@@ -250,7 +253,7 @@ func _process(delta):
 	if Global.esta_chovendo():
 		_timer_chuva -= delta
 		if _timer_chuva <= 0.0:
-			_timer_chuva = 0.5 # Verifica teto apenas 2x por segundo, nï¿½o 60x!
+			_timer_chuva = 2.0 # Verifica teto apenas 2x por segundo, nï¿½o 60x!
 			_protegida_chuva_cache = esta_protegida_da_chuva()
 		luz.visible = _protegida_chuva_cache
 	else:

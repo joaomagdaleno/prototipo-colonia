@@ -110,6 +110,8 @@ func carregar_jogo() -> bool:
 	Global.vida_jogador = int(rec.get("vida_jogador", 100))
 	Global.saciedade_jogador = float(rec.get("saciedade_jogador", 85.0))
 	Global.hidratacao_jogador = float(rec.get("hidratacao_jogador", 85.0))
+	Global.estradas_pos.clear()
+	Global.baus_ativos.clear()
 	Global.estoque_total_baus = {"madeira": 0, "pedra": 0, "gravetos": 0, "pedrinhas": 0, "comida": 0, "frutas": 0}
 	
 	var jogador = get_tree().current_scene.get_node_or_null("Jogador")
@@ -131,6 +133,8 @@ func carregar_jogo() -> bool:
 			var pos = item["pos"]
 			inst.global_position = Vector3(pos[0], pos[1], pos[2])
 			inst.rotation.y = float(item["rot_y"])
+			if inst.is_in_group("estradas"):
+				Global.estradas_pos[Vector2i(int(round(inst.global_position.x)), int(round(inst.global_position.z)))] = true
 			if item["construida"] and inst.has_method("construir") and not inst.construida:
 				var c_mad = inst.custo_madeira; var c_ped = inst.custo_pedra; var c_grav = inst.custo_gravetos; var c_pedr = inst.custo_pedrinhas
 				inst.custo_madeira = 0; inst.custo_pedra = 0; inst.custo_gravetos = 0; inst.custo_pedrinhas = 0
