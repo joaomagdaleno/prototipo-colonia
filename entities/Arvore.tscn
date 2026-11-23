@@ -23,7 +23,7 @@ radius = 0.3
 script = ExtResource("1_3coyu")
 
 [node name="Tronco" type="MeshInstance3D" parent="." unique_id=527596313]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
 mesh = SubResource("CylinderMesh_pecf4")
 surface_material_override/0 = SubResource("StandardMaterial3D_m7c1q")
 
@@ -33,7 +33,7 @@ mesh = SubResource("CapsuleMesh_0aq65")
 surface_material_override/0 = SubResource("StandardMaterial3D_pxyvn")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=403726421]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
 shape = SubResource("CylinderShape3D_nrtj6")
 
 [node name="NavigationObstacle3D" type="NavigationObstacle3D" parent="." unique_id=492736880]

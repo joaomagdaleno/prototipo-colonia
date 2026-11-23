@@ -14,7 +14,7 @@ radius = 0.8
 script = ExtResource("1_uqrgu")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=526455213]
-transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 0, 0, 0)
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 0, -0.15, 0)
 mesh = SubResource("SphereMesh_nrtj6")
 surface_material_override/0 = SubResource("StandardMaterial3D_m7c1q")
 
