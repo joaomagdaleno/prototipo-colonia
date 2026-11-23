@@ -4,6 +4,9 @@ extends Node
 var indice_mobilia: int = 0
 var rotacao_mobilia: float = 0.0
 var fantasma_1p: Node3D = null
+var _forma_snap: SphereShape3D = null
+var _ultima_celula_snap: Vector3i = Vector3i(999999, 999999, 999999)
+var _cache_vizinhos_snap: Array[Node3D] = []
 
 @onready var jogador: CharacterBody3D = get_parent()
 @onready var camera: Camera3D = get_parent().get_node("Camera3D")
@@ -87,108 +90,141 @@ func atualizar_fantasma():
 	fantasma_1p.rotation.y = lerp_angle(fantasma_1p.rotation.y, rotacao_mobilia, 0.35)
 	_atualizar_cor(_posicao_livre(fantasma_1p.global_position))
 
+func _obter_estruturas_proximas(pos_alvo: Vector3) -> Array[Node3D]:
+var celula_atual = Vector3i(roundi(pos_alvo.x), roundi(pos_alvo.y), roundi(pos_alvo.z))
+if celula_atual == _ultima_celula_snap:
+return _cache_vizinhos_snap
+
+_ultima_celula_snap = celula_atual
+_cache_vizinhos_snap.clear()
+
+if _forma_snap == null:
+_forma_snap = SphereShape3D.new()
+_forma_snap.radius = 3.5
+
+var query = PhysicsShapeQueryParameters3D.new()
+query.shape = _forma_snap
+query.transform = Transform3D(Basis(), pos_alvo)
+query.collision_mask = 1
+query.collide_with_bodies = true
+query.collide_with_areas = false
+
+var resultados = jogador.get_world_3d().direct_space_state.intersect_shape(query, 64)
+var vistos: Dictionary = {}
+for hit in resultados:
+var col = hit.get("collider")
+if not is_instance_valid(col):
+continue
+var est = col.get_parent()
+if not is_instance_valid(est) or est == fantasma_1p or vistos.has(est):
+continue
+vistos[est] = true
+if est is Node3D:
+_cache_vizinhos_snap.append(est)
+
+return _cache_vizinhos_snap
+
 func _calcular_snap_modular(pos_alvo: Vector3) -> Vector3:
-	# 1. Snap para Pisos (grade de 1x1)
-	if fantasma_1p.is_in_group("pisos"):
-		var melhor_encaixe = pos_alvo
-		var menor_dist = 1.3
-		for piso in get_tree().get_nodes_in_group("pisos"):
-			if piso == fantasma_1p or not is_instance_valid(piso) or pos_alvo.distance_squared_to(piso.global_position) > 25.0: continue
-			for dir in [Vector3(1,0,0), Vector3(-1,0,0), Vector3(0,0,1), Vector3(0,0,-1)]:
-				var ponto = piso.global_position + dir.rotated(Vector3.UP, piso.rotation.y)
-				var d = Vector2(pos_alvo.x, pos_alvo.z).distance_to(Vector2(ponto.x, ponto.z))
-				if d < menor_dist:
-					menor_dist = d
-					melhor_encaixe = ponto
-					rotacao_mobilia = piso.rotation.y
-		return melhor_encaixe
+var vizinhos = _obter_estruturas_proximas(pos_alvo)
 
-	# 2. Snap para Portão dentro de Batente de Porta
-	if "is_portao" in fantasma_1p and fantasma_1p.is_portao:
-		var menor_dist = 1.5
-		var melhor_encaixe = pos_alvo
-		for batente in get_tree().get_nodes_in_group("batentes"):
-			if not is_instance_valid(batente): continue
-			var d = pos_alvo.distance_to(batente.global_position)
-			if d < menor_dist:
-				menor_dist = d
-				melhor_encaixe = batente.global_position
-				rotacao_mobilia = batente.rotation.y
-		return melhor_encaixe
+# 1. Snap para Pisos (grade de 1x1)
+if fantasma_1p.is_in_group("pisos"):
+var melhor_encaixe = pos_alvo
+var menor_dist = 1.3
+for piso in vizinhos:
+if not is_instance_valid(piso) or not piso.is_in_group("pisos"): continue
+for dir in [Vector3(1,0,0), Vector3(-1,0,0), Vector3(0,0,1), Vector3(0,0,-1)]:
+var ponto = piso.global_position + dir.rotated(Vector3.UP, piso.rotation.y)
+var d = Vector2(pos_alvo.x, pos_alvo.z).distance_to(Vector2(ponto.x, ponto.z))
+if d < menor_dist:
+menor_dist = d
+melhor_encaixe = ponto
+rotacao_mobilia = piso.rotation.y
+return melhor_encaixe
 
-	# 3. Snap para Paredes, Paredes com Janela e Batentes de Porta
-	if fantasma_1p.is_in_group("paredes") or ("is_parede" in fantasma_1p and fantasma_1p.is_parede):
-		var paredes = get_tree().get_nodes_in_group("paredes")
-		var menor_dist = 1.6
-		var melhor_encaixe = pos_alvo
-		
-		for piso in get_tree().get_nodes_in_group("pisos"):
-			if not is_instance_valid(piso) or pos_alvo.distance_squared_to(piso.global_position) > 25.0: continue
-			for borda in [Vector3(0, 0, 0.5), Vector3(0, 0, -0.5), Vector3(0.5, 0, 0), Vector3(-0.5, 0, 0)]:
-				var ponto = piso.global_position + borda.rotated(Vector3.UP, piso.rotation.y)
-				var d = Vector2(pos_alvo.x, pos_alvo.z).distance_to(Vector2(ponto.x, ponto.z))
-				if d < menor_dist:
-					menor_dist = d
-					melhor_encaixe = Vector3(ponto.x, piso.global_position.y, ponto.z)
-					rotacao_mobilia = piso.rotation.y + (PI/2.0 if abs(borda.x) > 0.0 else 0.0)
-					
-		for p in paredes:
-			if p == fantasma_1p or not is_instance_valid(p) or pos_alvo.distance_squared_to(p.global_position) > 25.0: continue
-			for dir in [Vector3(1.0, 0, 0), Vector3(-1.0, 0, 0)]:
-				var ponto = p.global_position + dir.rotated(Vector3.UP, p.rotation.y)
-				var d = pos_alvo.distance_to(ponto)
-				if d < menor_dist:
-					menor_dist = d
-					melhor_encaixe = ponto
-					rotacao_mobilia = p.rotation.y
-		return melhor_encaixe
+# 2. Snap para Portao dentro de Batente de Porta
+if "is_portao" in fantasma_1p and fantasma_1p.is_portao:
+var menor_dist = 1.5
+var melhor_encaixe = pos_alvo
+for batente in vizinhos:
+if not is_instance_valid(batente) or not batente.is_in_group("batentes"): continue
+var d = pos_alvo.distance_to(batente.global_position)
+if d < menor_dist:
+menor_dist = d
+melhor_encaixe = batente.global_position
+rotacao_mobilia = batente.rotation.y
+return melhor_encaixe
 
-	# 4. Snap para Tetos (encaixa no topo de Paredes a 2.4m de altura)
-	if fantasma_1p.is_in_group("tetos") or ("is_teto" in fantasma_1p and fantasma_1p.is_teto):
-		var menor_dist = 1.6
-		var melhor_encaixe = pos_alvo
-		for piso in get_tree().get_nodes_in_group("pisos"):
-			if not is_instance_valid(piso) or pos_alvo.distance_squared_to(piso.global_position) > 25.0: continue
-			var topo_piso = piso.global_position + Vector3(0, 2.4, 0)
-			var d = Vector2(pos_alvo.x, pos_alvo.z).distance_to(Vector2(topo_piso.x, topo_piso.z))
-			if d < menor_dist:
-				menor_dist = d
-				melhor_encaixe = topo_piso
-				rotacao_mobilia = piso.rotation.y
-		for t in get_tree().get_nodes_in_group("tetos"):
-			if t == fantasma_1p or not is_instance_valid(t) or pos_alvo.distance_squared_to(t.global_position) > 25.0: continue
-			for dir in [Vector3(1,0,0), Vector3(-1,0,0), Vector3(0,0,1), Vector3(0,0,-1)]:
-				var ponto = t.global_position + dir.rotated(Vector3.UP, t.rotation.y)
-				var d = Vector2(pos_alvo.x, pos_alvo.z).distance_to(Vector2(ponto.x, ponto.z))
-				if d < menor_dist:
-					menor_dist = d
-					melhor_encaixe = ponto
-					rotacao_mobilia = t.rotation.y
-		return melhor_encaixe
+# 3. Snap para Paredes, Paredes com Janela e Batentes de Porta
+if fantasma_1p.is_in_group("paredes") or ("is_parede" in fantasma_1p and fantasma_1p.is_parede):
+var menor_dist = 1.6
+var melhor_encaixe = pos_alvo
 
-	# 5. Snap lateral para Muros de Pedra (1.0m)
-	if "is_muro" in fantasma_1p and fantasma_1p.is_muro:
-		var menor_dist = 1.4
-		var melhor_encaixe = pos_alvo
-		for m in get_tree().get_nodes_in_group("construidos") + get_tree().get_nodes_in_group("projetos"):
-			if m == fantasma_1p or not is_instance_valid(m) or not ("is_muro" in m and m.is_muro): continue
-			for dir in [Vector3(1.0, 0, 0), Vector3(-1.0, 0, 0)]:
-				var ponto = m.global_position + dir.rotated(Vector3.UP, m.rotation.y)
-				var d = pos_alvo.distance_to(ponto)
-				if d < menor_dist:
-					menor_dist = d
-					melhor_encaixe = ponto
-					rotacao_mobilia = m.rotation.y
-		return melhor_encaixe
+for est in vizinhos:
+if not is_instance_valid(est): continue
+if est.is_in_group("pisos"):
+for borda in [Vector3(0, 0, 0.5), Vector3(0, 0, -0.5), Vector3(0.5, 0, 0), Vector3(-0.5, 0, 0)]:
+var ponto = est.global_position + borda.rotated(Vector3.UP, est.rotation.y)
+var d = Vector2(pos_alvo.x, pos_alvo.z).distance_to(Vector2(ponto.x, ponto.z))
+if d < menor_dist:
+menor_dist = d
+melhor_encaixe = Vector3(ponto.x, est.global_position.y, ponto.z)
+rotacao_mobilia = est.rotation.y + (PI/2.0 if abs(borda.x) > 0.0 else 0.0)
+elif est.is_in_group("paredes") or ("is_parede" in est and est.is_parede):
+for dir in [Vector3(1.0, 0, 0), Vector3(-1.0, 0, 0)]:
+var ponto = est.global_position + dir.rotated(Vector3.UP, est.rotation.y)
+var d = pos_alvo.distance_to(ponto)
+if d < menor_dist:
+menor_dist = d
+melhor_encaixe = ponto
+rotacao_mobilia = est.rotation.y
+return melhor_encaixe
 
-	# 6. Apoiar moveis/estruturas sobre Pisos sem afundar
-	for piso in get_tree().get_nodes_in_group("pisos"):
-		if is_instance_valid(piso) and abs(pos_alvo.x - piso.global_position.x) <= 0.55 and abs(pos_alvo.z - piso.global_position.z) <= 0.55:
-			pos_alvo.y = max(pos_alvo.y, piso.global_position.y + 0.1)
-			break
+# 4. Snap para Tetos (encaixa no topo de Paredes a 2.4m de altura)
+if fantasma_1p.is_in_group("tetos") or ("is_teto" in fantasma_1p and fantasma_1p.is_teto):
+var menor_dist = 1.6
+var melhor_encaixe = pos_alvo
+for est in vizinhos:
+if not is_instance_valid(est): continue
+if est.is_in_group("pisos"):
+var topo_piso = est.global_position + Vector3(0, 2.4, 0)
+var d = Vector2(pos_alvo.x, pos_alvo.z).distance_to(Vector2(topo_piso.x, topo_piso.z))
+if d < menor_dist:
+menor_dist = d
+melhor_encaixe = topo_piso
+rotacao_mobilia = est.rotation.y
+elif est.is_in_group("tetos") or ("is_teto" in est and est.is_teto):
+for dir in [Vector3(1,0,0), Vector3(-1,0,0), Vector3(0,0,1), Vector3(0,0,-1)]:
+var ponto = est.global_position + dir.rotated(Vector3.UP, est.rotation.y)
+var d = Vector2(pos_alvo.x, pos_alvo.z).distance_to(Vector2(ponto.x, ponto.z))
+if d < menor_dist:
+menor_dist = d
+melhor_encaixe = ponto
+rotacao_mobilia = est.rotation.y
+return melhor_encaixe
 
-	return pos_alvo
+# 5. Snap lateral para Muros de Pedra (1.0m)
+if "is_muro" in fantasma_1p and fantasma_1p.is_muro:
+var menor_dist = 1.4
+var melhor_encaixe = pos_alvo
+for m in vizinhos:
+if not is_instance_valid(m) or not ("is_muro" in m and m.is_muro): continue
+for dir in [Vector3(1.0, 0, 0), Vector3(-1.0, 0, 0)]:
+var ponto = m.global_position + dir.rotated(Vector3.UP, m.rotation.y)
+var d = pos_alvo.distance_to(ponto)
+if d < menor_dist:
+menor_dist = d
+melhor_encaixe = ponto
+rotacao_mobilia = m.rotation.y
+return melhor_encaixe
 
+# 6. Apoiar moveis/estruturas sobre Pisos sem afundar
+for piso in vizinhos:
+if is_instance_valid(piso) and piso.is_in_group("pisos") and abs(pos_alvo.x - piso.global_position.x) <= 0.55 and abs(pos_alvo.z - piso.global_position.z) <= 0.55:
+pos_alvo.y = max(pos_alvo.y, piso.global_position.y + 0.1)
+break
+
+return pos_alvo
 
 func _posicao_livre(pos: Vector3) -> bool:
 	var segurando_piso = fantasma_1p.is_in_group("pisos")
@@ -196,23 +232,24 @@ func _posicao_livre(pos: Vector3) -> bool:
 	var segurando_parede = fantasma_1p.is_in_group("paredes") or ("is_parede" in fantasma_1p and fantasma_1p.is_parede)
 	var segurando_portao = "is_portao" in fantasma_1p and fantasma_1p.is_portao
 
-	for grupo in ["projetos", "construidos"]:
-		for p in get_tree().get_nodes_in_group(grupo):
-			if p == fantasma_1p or not is_instance_valid(p):
-				continue
-			# Permite encaixar o Portão exatamente dentro do Batente de Porta
-			if segurando_portao and p.is_in_group("batentes"):
-				continue
-			# Peças de tipos verticais diferentes podem sobrepor o plano horizontal
-			if (segurando_piso and p.is_in_group("tetos")) or (segurando_teto and p.is_in_group("pisos")):
-				continue
-			if segurando_parede and (p.is_in_group("pisos") or p.is_in_group("tetos")):
-				continue
-			
-			var dx = p.global_position.x - pos.x
-			var dz = p.global_position.z - pos.z
-			if (dx * dx + dz * dz) < 0.16 and abs(p.global_position.y - pos.y) < 0.5:
-				return false
+	for p in _obter_estruturas_proximas(pos):
+		if p == fantasma_1p or not is_instance_valid(p):
+			continue
+		if not (p.is_in_group("projetos") or p.is_in_group("construidos")):
+			continue
+		# Permite encaixar o Portao exatamente dentro do Batente de Porta
+		if segurando_portao and p.is_in_group("batentes"):
+			continue
+		# Pecas de tipos verticais diferentes podem sobrepor o plano horizontal
+		if (segurando_piso and p.is_in_group("tetos")) or (segurando_teto and p.is_in_group("pisos")):
+			continue
+		if segurando_parede and (p.is_in_group("pisos") or p.is_in_group("tetos")):
+			continue
+
+		var dx = p.global_position.x - pos.x
+		var dz = p.global_position.z - pos.z
+		if (dx * dx + dz * dz) < 0.16 and abs(p.global_position.y - pos.y) < 0.5:
+			return false
 	return true
 
 
@@ -241,4 +278,5 @@ func colocar_peca():
 	novo_item.global_position = fantasma_1p.global_position
 	novo_item.rotation.y = rotacao_mobilia
 	novo_item.add_to_group("projetos")
+	_ultima_celula_snap = Vector3i(999999, 999999, 999999)
 	print("Projeto colocado: ", novo_item.name)

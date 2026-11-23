@@ -94,6 +94,23 @@ func _otimizar_luz_fogueira():
 	luz.distance_fade_begin = 25.0
 	luz.distance_fade_length = 10.0
 
+static var _indice_baus_por_recurso: Dictionary = {}
+
+static func _registrar_bau_no_indice(bau: Node, recurso: String):
+	if not _indice_baus_por_recurso.has(recurso):
+		_indice_baus_por_recurso[recurso] = []
+	var lista: Array = _indice_baus_por_recurso[recurso]
+	if not lista.has(bau):
+		lista.append(bau)
+
+static func _remover_bau_do_indice(bau: Node, recurso: String):
+	if _indice_baus_por_recurso.has(recurso):
+		_indice_baus_por_recurso[recurso].erase(bau)
+
+static func _remover_bau_de_todos_indices(bau: Node):
+	for lista in _indice_baus_por_recurso.values():
+		lista.erase(bau)
+
 func _obter_total_disponivel(recurso: String) -> int:
 	return int(Global.get(recurso)) + int(Global.estoque_total_baus.get(recurso, 0))
 
@@ -104,15 +121,26 @@ func _consumir_recurso_global_ou_bau(recurso: String, qtd: int):
 		var tirar_jog = min(no_jogador, restante)
 		Global.set(recurso, no_jogador - tirar_jog)
 		restante -= tirar_jog
-		
-	if restante > 0:
-		for bau in Global.baus_ativos:
-			if is_instance_valid(bau) and bau.construida and bau.has_method("retirar_item_do_bau"):
-				var tirado = bau.retirar_item_do_bau(recurso, restante)
-				restante -= tirado
-				if restante <= 0:
-					break
 
+	if restante <= 0 or int(Global.estoque_total_baus.get(recurso, 0)) <= 0:
+		return
+
+	# Garante sincronizacao caso o save tenha populado estoque_bau diretamente
+	if not _indice_baus_por_recurso.has(recurso) or _indice_baus_por_recurso[recurso].is_empty():
+		for bau in Global.baus_ativos:
+			if is_instance_valid(bau) and bau.construida and int(bau.estoque_bau.get(recurso, 0)) > 0:
+				_registrar_bau_no_indice(bau, recurso)
+
+	if _indice_baus_por_recurso.has(recurso):
+		var candidatos: Array = _indice_baus_por_recurso[recurso].duplicate()
+		for bau in candidatos:
+			if not is_instance_valid(bau) or not bau.construida:
+				_remover_bau_do_indice(bau, recurso)
+				continue
+			var tirado = bau.retirar_item_do_bau(recurso, restante)
+			restante -= tirado
+			if restante <= 0:
+				break
 func pode_pagar() -> bool:
 	return (
 		_obter_total_disponivel("madeira") >= custo_madeira and
@@ -202,6 +230,8 @@ func construir() -> bool:
 	AudioManager.tocar("construir")
 	_configurar_obstaculo_navegacao()
 	Global.atualizar_navmesh_otimizado()
+	if get_tree():
+		get_tree().call_group("colonos", "notificar_obstaculo_alterado", global_position)
 	return true
 
 
@@ -263,6 +293,7 @@ func demolir():
 		Global.gravetos += int(custo_gravetos / 2.0)
 		Global.pedrinhas += int(custo_pedrinhas / 2.0)
 		if is_bau:
+			_remover_bau_de_todos_indices(self)
 			Global.baus_ativos.erase(self)
 			for tipo in estoque_bau.keys():
 				var qtd_guardada = int(estoque_bau[tipo])
@@ -274,6 +305,8 @@ func demolir():
 		else:
 			print("Estrutura demolida! Metade dos recursos devolvida.")
 		Global.atualizar_navmesh_otimizado()
+	if get_tree():
+		get_tree().call_group("colonos", "notificar_obstaculo_alterado", global_position)
 	else:
 		print("Projeto cancelado: ", name)
 
@@ -300,6 +333,8 @@ func alternar_portao():
 	if is_instance_valid(obstaculo_nav):
 		obstaculo_nav.avoidance_enabled = not portao_aberto
 	AudioManager.tocar("portao")
+	if not portao_aberto and get_tree():
+		get_tree().call_group("colonos", "notificar_obstaculo_alterado", global_position)
 	
 	# Desativa colisï¿½o quando aberto para jogador e colonos passarem livres
 	corpo_fisico.collision_layer = 0 if portao_aberto else 1
@@ -324,6 +359,8 @@ func receber_dano_estrutura(dano: int):
 	if vida_atual <= 0:
 		print("💥 Estrutura destruída pelos inimigos!")
 		Global.atualizar_navmesh_otimizado()
+	if get_tree():
+		get_tree().call_group("colonos", "notificar_obstaculo_alterado", global_position)
 		queue_free()
 
 func reparar() -> bool:
@@ -367,6 +404,7 @@ func guardar_item_no_bau(recurso: String, quantidade: int = 1) -> bool:
 	if not estoque_bau.has(recurso):
 		estoque_bau[recurso] = 0
 	estoque_bau[recurso] += quantidade
+	_registrar_bau_no_indice(self, recurso)
 	Global.estoque_total_baus[recurso] = int(Global.estoque_total_baus.get(recurso, 0)) + quantidade
 	var tween = create_tween()
 	tween.tween_property(mesh, "scale", Vector3(1.05, 0.95, 1.05), 0.08)
@@ -377,12 +415,14 @@ func retirar_item_do_bau(recurso: String, quantidade: int = 1) -> int:
 	if not construida or not is_bau:
 		return 0
 	if not estoque_bau.has(recurso) or estoque_bau[recurso] <= 0:
+		_remover_bau_do_indice(self, recurso)
 		return 0
 	var qtd_retirada = min(quantidade, estoque_bau[recurso])
 	estoque_bau[recurso] -= qtd_retirada
+	if estoque_bau[recurso] <= 0:
+		_remover_bau_do_indice(self, recurso)
 	Global.estoque_total_baus[recurso] = max(0, int(Global.estoque_total_baus.get(recurso, 0)) - qtd_retirada)
 	return qtd_retirada
-
 func transferir_tudo_do_jogador():
 	if not construida or not is_bau:
 		return

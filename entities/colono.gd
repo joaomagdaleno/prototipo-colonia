@@ -47,6 +47,8 @@ var tempo_espera: float = 1.5
 
 var posicao_anterior: Vector3 = Vector3.ZERO
 var tempo_preso: float = 0.0
+var _recalculos_rota_consecutivos: int = 0
+var _timestamp_ultimo_recalculo: float = 0.0
 
 @onready var agent: NavigationAgent3D = $NavigationAgent3D
 @onready var tarefas = $Tarefas
@@ -110,6 +112,7 @@ func _physics_process(delta):
 		var destino = tarefas.escolher_proxima_tarefa()
 		if destino != Vector3.INF:
 			tempo_tentando = 0.0
+			_recalculos_rota_consecutivos = 0
 			agent.target_position = destino
 		else:
 			tempo_espera = 0.5
@@ -230,7 +233,44 @@ func _otimizar_renderizacao_vega8():
 			filho.visibility_range_end_margin = 5.0
 			filho.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_DISABLED
 
+func notificar_obstaculo_alterado(pos_obstaculo: Vector3):
+	if dormindo or esta_trabalhando or not tarefas.tem_alvo():
+		return
+	if global_position.distance_squared_to(pos_obstaculo) <= 324.0: # Raio de 18m
+		agent.target_position = agent.target_position
+
+func _tratar_obstrucao_fisica():
+	if dormindo or esta_trabalhando or not tarefas.tem_alvo():
+		return
+	var agora = Time.get_ticks_msec() * 0.001
+	if agora - _timestamp_ultimo_recalculo < 0.25:
+		return
+	if agora - _timestamp_ultimo_recalculo > 1.5:
+		_recalculos_rota_consecutivos = 0
+
+	_timestamp_ultimo_recalculo = agora
+	_recalculos_rota_consecutivos += 1
+
+	if _recalculos_rota_consecutivos == 1:
+		# Primeira colisao com portao fechado ou parede: recalcula rota imediatamente
+		agent.target_position = agent.target_position
+	else:
+		# Passagem totalmente bloqueada mesmo apos recalcular: desiste sem ficar preso 1.5s
+		_recalculos_rota_consecutivos = 0
+		tempo_tentando = 0.0
+		tempo_preso = 0.0
+		tarefas.cancelar_e_ignorar_atual()
+
 func _on_velocity_computed(safe_velocity: Vector3):
 	velocity.x = safe_velocity.x
 	velocity.z = safe_velocity.z
 	move_and_slide()
+
+	if get_slide_collision_count() > 0:
+		for i in range(get_slide_collision_count()):
+			var col = get_slide_collision(i)
+			if abs(col.get_normal().y) < 0.5:
+				var collider = col.get_collider()
+				if is_instance_valid(collider) and collider.get_parent() and collider.get_parent().is_in_group("construidos"):
+					_tratar_obstrucao_fisica()
+					break

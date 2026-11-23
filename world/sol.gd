@@ -1,8 +1,10 @@
 extends DirectionalLight3D
 
 var _timer_sol: float = 0.0
+var _cam_aerea_cache: Camera3D = null
 
 func _ready():
+	directional_shadow_max_distance = 42.0
 	_atualizar_sol()
 
 func _process(delta):
@@ -17,8 +19,18 @@ func _atualizar_sol():
 	var progresso_dia = (Global.hora_do_dia - 6.0) / 24.0
 	rotation.x = -progresso_dia * TAU
 
-	# Desliga sombras direcionais e reduz energia a noite para nao iluminar por baixo do chao
 	var noite = Global.esta_de_noite()
-	shadow_enabled = not noite
 	if noite:
+		if shadow_enabled:
+			shadow_enabled = false
 		light_energy = 0.05
+		return
+
+	# Na visao aerea com zoom alto (Y > 32m), desliga sombras dinamicas para aliviar a Vega 8
+	if not is_instance_valid(_cam_aerea_cache) and get_parent():
+		_cam_aerea_cache = get_parent().get_node_or_null("CameraAerea")
+	var zoom_aereo_alto = is_instance_valid(_cam_aerea_cache) and _cam_aerea_cache.current and _cam_aerea_cache.global_position.y > 32.0
+
+	var deve_ter_sombra = not zoom_aereo_alto
+	if shadow_enabled != deve_ter_sombra:
+		shadow_enabled = deve_ter_sombra

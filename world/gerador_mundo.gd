@@ -42,48 +42,131 @@ func _ready():
 		jogador.nascer_no_mundo(Vector3(0.0, altura_solo + 0.5, 3.0))
 
 
+var _cache_altura_chao: Dictionary = {}
+var _raio_chao_cache: float = -1.0
+
 func _obter_raio_chao() -> float:
+	if _raio_chao_cache > 0.0:
+		return _raio_chao_cache
 	var chao = get_parent().get_node_or_null("Chao") if get_parent() else null
 	if chao:
 		for filho in chao.get_children():
 			if filho is MeshInstance3D and filho.mesh:
 				var tamanho = filho.mesh.get_aabb().size * chao.scale * filho.scale
-				return max(10.0, (min(tamanho.x, tamanho.z) / 2.0) - 2.0)
-	return 123.0
+				_raio_chao_cache = max(10.0, (min(tamanho.x, tamanho.z) / 2.0) - 2.0)
+				return _raio_chao_cache
+	_raio_chao_cache = 123.0
+	return _raio_chao_cache
 
 func _obter_altura_chao(pos_x: float, pos_z: float) -> float:
+	var chave = Vector2i(roundi(pos_x * 0.5), roundi(pos_z * 0.5))
+	if _cache_altura_chao.has(chave):
+		return _cache_altura_chao[chave]
 	var space_state = get_world_3d().direct_space_state
-	var query = PhysicsRayQueryParameters3D.create(Vector3(pos_x, 50.0, pos_z), Vector3(pos_x, -50.0, pos_z))
+	var query = PhysicsRayQueryParameters3D.create(Vector3(pos_x, 12.0, pos_z), Vector3(pos_x, -4.0, pos_z))
 	query.collision_mask = 1
 	var resultado = space_state.intersect_ray(query)
-	return resultado.position.y if resultado else 0.0
-
+	var altura: float = resultado.position.y if resultado else 0.0
+	_cache_altura_chao[chave] = altura
+	return altura
 func gerar_mundo_completo():
 	for filho in get_children():
 		filho.queue_free()
-		
+
 	var raio = _obter_raio_chao()
 	var area = PI * raio * raio
 	var posicoes_ocupadas: Array[Vector2] = []
-	
+
 	# Quantidades otimizadas para a Radeon Vega 8 (~250x250m)
-	var qtd_arvores = max(10, int(area / 145.0))   # ~320 ï¿½rvores
+	var qtd_arvores = max(10, int(area / 145.0))   # ~320 arvores
 	var qtd_rochas = max(4, int(area / 380.0))     # ~125 rochas
 	var qtd_arbustos = max(5, int(area / 260.0))   # ~180 arbustos
-	var qtd_gravetos = max(10, int(area / 260.0))  # ~265 gravetos
-	var qtd_pedrinhas = max(10, int(area / 280.0)) # ~240 pedrinhas
-	
+	var qtd_gravetos = max(10, int(area / 260.0))  # ~265 gravetos (1 Draw Call)
+	var qtd_pedrinhas = max(10, int(area / 280.0)) # ~240 pedrinhas (1 Draw Call)
+
 	print("🌲 Gerando Mundo Procedural -> Árvores:", qtd_arvores, " | Rochas:", qtd_rochas, " | Arbustos:", qtd_arbustos)
-	
+
 	_espalhar(cena_arvore, qtd_arvores, raio, 4.0, posicoes_ocupadas, true, 145.0, true)
 	_espalhar(cena_rocha, qtd_rochas, raio, 3.0, posicoes_ocupadas, true, 95.0, false)
 	_espalhar(cena_arbusto, qtd_arbustos, raio, 2.2, posicoes_ocupadas, true, 55.0, false)
-	_espalhar(cena_graveto, qtd_gravetos, raio, 1.5, posicoes_ocupadas, false, 22.0, false)
-	_espalhar(cena_pedrinha, qtd_pedrinhas, raio, 1.5, posicoes_ocupadas, false, 22.0, false)
-	
+	_espalhar_multimesh(cena_graveto, qtd_gravetos, raio, 1.5, posicoes_ocupadas, "MultiMeshGravetos")
+	_espalhar_multimesh(cena_pedrinha, qtd_pedrinhas, raio, 1.5, posicoes_ocupadas, "MultiMeshPedrinhas")
+
 	if not Engine.is_editor_hint():
 		Global.atualizar_navmesh_otimizado()
 
+func _espalhar_multimesh(cena: PackedScene, qtd: int, raio: float, dist_min: float, ocupadas: Array[Vector2], nome_lote: String):
+	if not cena:
+		return
+	var dist_min_sq = dist_min * dist_min
+	var jogador = get_tree().current_scene.get_node_or_null("Jogador") if not Engine.is_editor_hint() else null
+	var bancada = get_tree().current_scene.get_node_or_null("Bancada")
+	var pos_jogador = Vector2(jogador.global_position.x, jogador.global_position.z) if is_instance_valid(jogador) else Vector2.ZERO
+	var pos_bancada = Vector2(bancada.global_position.x, bancada.global_position.z) if is_instance_valid(bancada) else Vector2.ZERO
+
+	var instancias: Array[Node3D] = []
+	var mesh_base: Mesh = null
+	var mat_base: Material = null
+	var escala_mesh: Vector3 = Vector3.ONE
+	var rot_mesh: Basis = Basis.IDENTITY
+
+	for i in range(qtd):
+		var pos_valida = false
+		var px = 0.0
+		var pz = 0.0
+		for tentativa in range(20):
+			px = randf_range(-raio, raio)
+			pz = randf_range(-raio, raio)
+			var candidata = Vector2(px, pz)
+			if candidata.distance_squared_to(pos_jogador) < 64.0 or candidata.distance_squared_to(pos_bancada) < 64.0:
+				continue
+			pos_valida = true
+			for p in ocupadas:
+				if candidata.distance_squared_to(p) < dist_min_sq:
+					pos_valida = false
+					break
+			if pos_valida:
+				break
+		if pos_valida:
+			var inst = cena.instantiate()
+			inst.position = Vector3(px, _obter_altura_chao(px, pz), pz)
+			inst.rotation.y = randf_range(0, TAU)
+			add_child(inst)
+			if Engine.is_editor_hint():
+				inst.owner = get_tree().edited_scene_root
+			if mesh_base == null:
+				for sub in inst.get_children():
+					if sub is MeshInstance3D and sub.mesh:
+						mesh_base = sub.mesh
+						mat_base = sub.get_active_material(0)
+						escala_mesh = sub.scale
+						rot_mesh = sub.transform.basis.orthonormalized()
+						break
+			instancias.append(inst)
+
+	if instancias.is_empty() or mesh_base == null:
+		return
+
+	var mm = MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = mesh_base
+	mm.instance_count = instancias.size()
+
+	var mmi = MultiMeshInstance3D.new()
+	mmi.name = nome_lote
+	mmi.multimesh = mm
+	mmi.material_override = mat_base
+	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mmi.visibility_range_end = 42.0
+	mmi.visibility_range_end_margin = 6.0
+	add_child(mmi)
+
+	for idx in range(instancias.size()):
+		var item = instancias[idx]
+		var xform = item.transform * Transform3D(rot_mesh.scaled(escala_mesh), Vector3.ZERO)
+		mm.set_instance_transform(idx, xform)
+		if item.has_method("vincular_multimesh"):
+			item.vincular_multimesh(mm, idx)
 func aplicar_otimizacao_item(inst: Node3D):
 	if not is_instance_valid(inst):
 		return
@@ -191,33 +274,35 @@ func _spawnar_fauna():
 		return
 	if get_tree().get_nodes_in_group("animais").size() >= max_animais:
 		return
-		
+
+	var px = randf_range(-100.0, 100.0)
+	var pz = randf_range(-100.0, 100.0)
+	var py = _obter_altura_chao(px, pz) + 0.5
+
 	var inst = cena_animal.instantiate()
 	inst.especie = "cervo" if randf() < 0.3 else "coelho"
 	if inst.especie == "cervo":
 		inst.scale = Vector3(1.5, 1.5, 1.5)
+	inst.position = Vector3(px, py, pz)
 	get_tree().current_scene.add_child(inst)
-	
-	var px = randf_range(-100.0, 100.0)
-	var pz = randf_range(-100.0, 100.0)
-	inst.global_position = Vector3(px, _obter_altura_chao(px, pz) + 0.5, pz)
 
 func _spawnar_inimigo_noturno():
 	if not cena_inimigo:
 		return
 	if get_tree().get_nodes_in_group("inimigos").size() >= max_inimigos_noite:
 		return
-		
+
 	var jogador = get_tree().current_scene.get_node_or_null("Jogador")
 	var centro = jogador.global_position if is_instance_valid(jogador) else Vector3.ZERO
-	
-	# Nasce a uma distï¿½ncia segura (entre 28m e 45m do jogador)
+
+	# Nasce a uma distancia segura (entre 28m e 45m do jogador)
 	var ang = randf_range(0, TAU)
 	var dist = randf_range(28.0, 45.0)
 	var px = clamp(centro.x + cos(ang) * dist, -110.0, 110.0)
 	var pz = clamp(centro.z + sin(ang) * dist, -110.0, 110.0)
-	
+	var py = _obter_altura_chao(px, pz) + 0.5
+
 	var inst = cena_inimigo.instantiate()
+	inst.position = Vector3(px, py, pz)
 	get_tree().current_scene.add_child(inst)
-	inst.global_position = Vector3(px, _obter_altura_chao(px, pz) + 0.5, pz)
 	print("🌙 Uma criatura surgiu na escuridão da floresta!")
