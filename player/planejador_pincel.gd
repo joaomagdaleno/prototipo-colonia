@@ -4,11 +4,16 @@ extends Node
 var ativo: bool = false
 var anel_visual: MeshInstance3D
 var _ultima_pos_pintada: Vector3 = Vector3.INF
+var _forma_pincel: SphereShape3D
 
 func _ready():
 	_criar_anel_visual()
+	_forma_pincel = SphereShape3D.new()
+	_forma_pincel.radius = raio_pincel
 
-func _criar_anel_visual():
+func _criar_anel_visual()
+	_forma_pincel = SphereShape3D.new()
+	_forma_pincel.radius = raio_pincel:
 	anel_visual = MeshInstance3D.new()
 	var imesh = ImmediateMesh.new()
 	var mat = StandardMaterial3D.new()
@@ -61,11 +66,16 @@ func atualizar(pos_chao: Vector3):
 		_ultima_pos_pintada = Vector3.INF
 
 func _pintar_recursos(centro: Vector3, marcar: bool):
-	var raio_sq = raio_pincel * raio_pincel
-	for grupo in ["arvores", "arbustos", "pedras", "coletaveis_chao"]:
-		for item in get_tree().get_nodes_in_group(grupo):
-			if is_instance_valid(item) and item.has_method("alternar_marcacao"):
-				var dx = item.global_position.x - centro.x
-				var dz = item.global_position.z - centro.z
-				if (dx * dx + dz * dz) <= raio_sq:
-					item.alternar_marcacao(marcar)
+	var espaco = anel_visual.get_world_3d().direct_space_state
+	var params = PhysicsShapeQueryParameters3D.new()
+	params.shape = _forma_pincel
+	params.transform = Transform3D(Basis.IDENTITY, centro)
+	params.collide_with_bodies = true
+	params.collide_with_areas = true
+	var hits = espaco.intersect_shape(params, 64)
+	for hit in hits:
+		var col = hit.get("collider")
+		if not is_instance_valid(col): continue
+		var alvo = col if col.has_method("alternar_marcacao") else col.get_parent()
+		if is_instance_valid(alvo) and alvo.has_method("alternar_marcacao"):
+			alvo.alternar_marcacao(marcar)

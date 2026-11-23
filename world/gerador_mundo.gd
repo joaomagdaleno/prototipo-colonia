@@ -69,16 +69,16 @@ func gerar_mundo_completo():
 	var qtd_arvores = max(10, int(area / 145.0))   # ~320 ï¿½rvores
 	var qtd_rochas = max(4, int(area / 380.0))     # ~125 rochas
 	var qtd_arbustos = max(5, int(area / 260.0))   # ~180 arbustos
-	var qtd_gravetos = max(10, int(area / 180.0))  # ~265 gravetos
-	var qtd_pedrinhas = max(10, int(area / 200.0)) # ~240 pedrinhas
+	var qtd_gravetos = max(10, int(area / 260.0))  # ~265 gravetos
+	var qtd_pedrinhas = max(10, int(area / 280.0)) # ~240 pedrinhas
 	
 	print("?? Gerando Mundo Procedural -> ï¿½rvores:", qtd_arvores, " | Rochas:", qtd_rochas, " | Arbustos:", qtd_arbustos)
 	
 	_espalhar(cena_arvore, qtd_arvores, raio, 4.0, posicoes_ocupadas, true, 145.0, true)
 	_espalhar(cena_rocha, qtd_rochas, raio, 3.0, posicoes_ocupadas, true, 95.0, false)
 	_espalhar(cena_arbusto, qtd_arbustos, raio, 2.2, posicoes_ocupadas, true, 55.0, false)
-	_espalhar(cena_graveto, qtd_gravetos, raio, 1.5, posicoes_ocupadas, false, 28.0, false)
-	_espalhar(cena_pedrinha, qtd_pedrinhas, raio, 1.5, posicoes_ocupadas, false, 28.0, false)
+	_espalhar(cena_graveto, qtd_gravetos, raio, 1.5, posicoes_ocupadas, false, 22.0, false)
+	_espalhar(cena_pedrinha, qtd_pedrinhas, raio, 1.5, posicoes_ocupadas, false, 22.0, false)
 	
 	if not Engine.is_editor_hint():
 		Global.atualizar_navmesh_otimizado()

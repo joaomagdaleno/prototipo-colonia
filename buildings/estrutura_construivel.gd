@@ -57,6 +57,7 @@ func _ready():
 		corpo_fisico.collision_layer = 0
 		corpo_fisico.collision_mask = 0
 		add_to_group("construidos")
+		Global.estradas_pos[Vector2i(int(round(global_position.x)), int(round(global_position.z)))] = true
 		return
 
 	# Projetos fantasmas nï¿½o projetam sombra
@@ -108,6 +109,8 @@ func pode_pagar() -> bool:
 	)
 
 func construir() -> bool:
+	if is_in_group("estradas"):
+		Global.estradas_pos.erase(Vector2i(int(round(global_position.x)), int(round(global_position.z))))
 	if construida:
 		return false
 		
@@ -132,6 +135,7 @@ func construir() -> bool:
 	
 	remove_from_group("projetos")
 	add_to_group("construidos")
+		Global.estradas_pos[Vector2i(int(round(global_position.x)), int(round(global_position.z)))] = true
 	
 	if luz:
 		luz.visible = true
@@ -200,6 +204,8 @@ func demolir():
 		print("A Bancada principal nÃ£o pode ser demolida!")
 		return
 		
+	if is_in_group("estradas"):
+		Global.estradas_pos.erase(Vector2i(int(round(global_position.x)), int(round(global_position.z))))
 	if construida:
 		Global.madeira += int(custo_madeira / 2.0)
 		Global.pedra += int(custo_pedra / 2.0)
@@ -225,6 +231,8 @@ func demolir():
 	queue_free()
 
 		
+	if is_in_group("estradas"):
+		Global.estradas_pos.erase(Vector2i(int(round(global_position.x)), int(round(global_position.z))))
 	if construida:
 		Global.madeira += int(custo_madeira / 2.0)
 		Global.pedra += int(custo_pedra / 2.0)

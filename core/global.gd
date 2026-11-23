@@ -12,6 +12,7 @@ var comida: int = 5
 var frutas: int = 0
 var carne_crua: int = 0
 var couro: int = 0
+var estradas_pos: Dictionary = {}
 var estoque_total_baus: Dictionary = {"madeira": 0, "pedra": 0, "gravetos": 0, "pedrinhas": 0, "comida": 0, "frutas": 0}
 
 # SobrevivÃªncia do Jogador
@@ -147,9 +148,14 @@ func obter_fator_logistica(pos_alvo: Vector3) -> float:
 		return 1.0
 
 	var tem_estrada_perto = false
-	for estrada in get_tree().get_nodes_in_group("estradas"):
-		if is_instance_valid(estrada) and estrada.global_position.distance_to(pos_alvo) <= 6.0:
-			tem_estrada_perto = true
+	var cx = int(round(pos_alvo.x))
+	var cz = int(round(pos_alvo.z))
+	for dx in range(-6, 7):
+		for dz in range(-6, 7):
+			if (dx * dx + dz * dz) <= 36 and estradas_pos.has(Vector2i(cx + dx, cz + dz)):
+				tem_estrada_perto = true
+				break
+		if tem_estrada_perto:
 			break
 
 	var distancia_extra = distancia - 15.0
@@ -200,6 +206,7 @@ func contratar_colono() -> bool:
 func iniciar_novo_jogo():
 	madeira = 0; pedra = 0; pedrinhas = 0; gravetos = 0
 	comida = 5; frutas = 0; carne_crua = 0; couro = 0
+	estradas_pos.clear()
 	estoque_total_baus = {"madeira": 0, "pedra": 0, "gravetos": 0, "pedrinhas": 0, "comida": 0, "frutas": 0}
 	hora_do_dia = 8.0
 	clima_atual = Clima.ENSOLARADO

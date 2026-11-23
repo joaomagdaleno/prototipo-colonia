@@ -165,11 +165,11 @@ func _tentar_alimentar_colono():
 				return
 
 func _calcular_velocidade_atual() -> float:
-	for estrada in get_tree().get_nodes_in_group("estradas"):
-		if is_instance_valid(estrada):
-			var dx = global_position.x - estrada.global_position.x
-			var dz = global_position.z - estrada.global_position.z
-			if (dx * dx + dz * dz) < 1.44:
+	var cx = int(round(global_position.x))
+	var cz = int(round(global_position.z))
+	for ox in [-1, 0, 1]:
+		for oz in [-1, 0, 1]:
+			if Global.estradas_pos.has(Vector2i(cx + ox, cz + oz)):
 				return 4.5
 	return VELOCIDADE
 
