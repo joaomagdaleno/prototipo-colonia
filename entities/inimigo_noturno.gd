@@ -180,7 +180,7 @@ func receber_dano(dano: int):
 	if not malhas.is_empty():
 		var tween = create_tween()
 		for f in malhas:
-		tween.parallel().tween_property(f, "scale", Vector3(1.18, 0.82, 1.18), 0.06)
+			tween.parallel().tween_property(f, "scale", Vector3(1.18, 0.82, 1.18), 0.06)
 			tween.tween_property(f, "scale", Vector3(1.0, 1.0, 1.0), 0.08)
 	print("Golpe na criatura! Vida restante: ", max(0, vida - dano))
 	vida -= dano
