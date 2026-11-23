@@ -134,7 +134,7 @@ func carregar_jogo() -> bool:
 			inst.global_position = Vector3(pos[0], pos[1], pos[2])
 			inst.rotation.y = float(item["rot_y"])
 			if inst.is_in_group("estradas"):
-				Global.estradas_pos[Vector2i(int(round(inst.global_position.x)), int(round(inst.global_position.z)))] = true
+				Global.estradas_pos[Vector2i(int(round(inst.global_position.x)), int(round(inst.global_position.z)))] = inst
 			if item["construida"] and inst.has_method("construir") and not inst.construida:
 				var c_mad = inst.custo_madeira; var c_ped = inst.custo_pedra; var c_grav = inst.custo_gravetos; var c_pedr = inst.custo_pedrinhas
 				inst.custo_madeira = 0; inst.custo_pedra = 0; inst.custo_gravetos = 0; inst.custo_pedrinhas = 0

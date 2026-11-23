@@ -12,6 +12,7 @@ var oceano_visual: MeshInstance3D
 var velocidade_movimento := 18.0
 var usando_controle: bool = false
 var ultima_pos_pintada: Vector3 = Vector3(9999, 9999, 9999)
+var _forma_demolir: SphereShape3D
 
 const LIMITE_MAPA_XZ := 105.0
 const ALTURA_MIN_ZOOM := 10.0
@@ -24,6 +25,8 @@ var modo_marcacao: bool:
 
 func _ready():
 	add_to_group("camera_aerea")
+	_forma_demolir = SphereShape3D.new()
+	_forma_demolir.radius = 0.45
 	far = 350.0
 
 	oceano_visual = GradeOceanoVisual.criar_oceano()
@@ -151,15 +154,29 @@ func _tentar_colocar_projeto(pos: Vector3):
 	novo.add_to_group("projetos")
 
 func _tentar_demolir_na_posicao(pos: Vector3):
-	for grupo in ["projetos", "construidos"]:
-		for item in get_tree().get_nodes_in_group(grupo):
-			if item != fantasma and is_instance_valid(item):
-				var dx = item.global_position.x - pos.x
-				var dz = item.global_position.z - pos.z
-				if (dx * dx + dz * dz) < 0.49:
-					if item.has_method("demolir"):
-						item.demolir()
-						return
+	# 1. Checagem O(1) instantanea para estradas (que nao possuem colisor fisico)
+	var celula = Vector2i(int(round(pos.x)), int(round(pos.z)))
+	if Global.estradas_pos.has(celula):
+		var est_rua = Global.estradas_pos[celula]
+		if is_instance_valid(est_rua) and est_rua is Node3D and est_rua.has_method("demolir"):
+			est_rua.demolir()
+			return
+
+	# 2. Consulta espacial nativa C++ (BVH) para projetos e construcoes com colisor
+	var params = PhysicsShapeQueryParameters3D.new()
+	params.shape = _forma_demolir
+	params.transform = Transform3D(Basis.IDENTITY, pos)
+	params.collision_mask = 3
+	params.collide_with_bodies = true
+	params.collide_with_areas = true
+	var hits = get_world_3d().direct_space_state.intersect_shape(params, 8)
+	for hit in hits:
+		var col = hit.get("collider")
+		if not is_instance_valid(col): continue
+		var alvo = col if col.has_method("demolir") else col.get_parent()
+		if is_instance_valid(alvo) and alvo != fantasma and (alvo.is_in_group("projetos") or alvo.is_in_group("construidos")):
+			alvo.demolir()
+			return
 
 func _unhandled_input(event):
 	if not current: return

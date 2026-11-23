@@ -39,6 +39,7 @@ func _ready():
 	agent.path_desired_distance = 0.5
 	agent.target_desired_distance = 0.5
 	posicao_anterior = global_position
+	_otimizar_renderizacao_vega8()
 
 func _physics_process(delta):
 	velocity.y = 0.0 if is_on_floor() else velocity.y - GRAVIDADE * delta
@@ -140,13 +141,14 @@ func _physics_process(delta):
 	else:
 		tempo_preso = 0.0
 	posicao_anterior = global_position
+	_otimizar_renderizacao_vega8()
 
 func _tentar_alimentar_colono():
 	if Global.comida > 0:
 		Global.comida -= 1
 		fome = 0.0
 		return
-	for bau in get_tree().get_nodes_in_group("baus"):
+	for bau in Global.baus_ativos:
 		if is_instance_valid(bau) and bau.construida and bau.has_method("retirar_item_do_bau"):
 			if bau.retirar_item_do_bau("comida", 1) > 0:
 				fome = 0.0
@@ -157,7 +159,7 @@ func _tentar_alimentar_colono():
 		Global.frutas -= 1
 		fome = 30.0
 		return
-	for bau in get_tree().get_nodes_in_group("baus"):
+	for bau in Global.baus_ativos:
 		if is_instance_valid(bau) and bau.construida and bau.has_method("retirar_item_do_bau"):
 			if bau.retirar_item_do_bau("frutas", 1) > 0:
 				fome = 30.0
@@ -188,3 +190,12 @@ func obter_status_texto() -> String:
 			return "ðŸ“¦ Levando ao BaÃº [" + str(carga) + "/" + str(CAPACIDADE_MOCHILA) + "] (" + est + ")"
 		return "ðŸš¶ Indo trabalhar (" + est + ")"
 	return "â³ Sem ordens (" + est + ")"
+
+func _otimizar_renderizacao_vega8():
+	for filho in get_children():
+		if filho is MeshInstance3D:
+			filho.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			filho.visibility_range_begin = 0.0
+			filho.visibility_range_end = 95.0
+			filho.visibility_range_end_margin = 5.0
+			filho.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_DISABLED

@@ -54,10 +54,13 @@ func _ready():
 		mesh.transparency = 0.0
 		mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		mesh.visibility_range_end = 120.0
-		corpo_fisico.collision_layer = 0
-		corpo_fisico.collision_mask = 0
+		# Remove colisor fisico da estrada para aliviar o servidor de fisica 3D
+		if corpo_fisico != self:
+			corpo_fisico.queue_free()
+		elif has_node("CollisionShape3D"):
+			$CollisionShape3D.queue_free()
 		add_to_group("construidos")
-		Global.estradas_pos[Vector2i(int(round(global_position.x)), int(round(global_position.z)))] = true
+		Global.estradas_pos[Vector2i(int(round(global_position.x)), int(round(global_position.z)))] = self
 		return
 
 	# Projetos fantasmas nï¿½o projetam sombra
@@ -135,7 +138,7 @@ func construir() -> bool:
 	
 	remove_from_group("projetos")
 	add_to_group("construidos")
-		Global.estradas_pos[Vector2i(int(round(global_position.x)), int(round(global_position.z)))] = true
+		Global.estradas_pos[Vector2i(int(round(global_position.x)), int(round(global_position.z)))] = self
 	
 	if luz:
 		luz.visible = true
