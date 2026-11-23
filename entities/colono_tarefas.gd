@@ -62,6 +62,11 @@ func escolher_proxima_tarefa() -> Vector3:
 			# Fallback: se nÃ£o hÃ¡ baÃºs construÃ­dos ou todos estÃ£o cheios, entrega no estoque global
 			_descarregar_mochila_no_global()
 
+		# 2.2 Prioridade por Profissao Especializada
+	var pos_esp = _buscar_tarefa_especializada()
+	if pos_esp != Vector3.INF:
+		return pos_esp
+
 	# 2.5 Canteiros agricolas (colher maduros ou plantar vazios)
 	var cant_maduro = _buscar_mais_proximo(Global.canteiros_ativos, func(c): return c.construida and c.canteiro_plantado and c.progresso_cultivo >= 100.0 and not c.reservado_colono)
 	if cant_maduro:
@@ -241,3 +246,32 @@ func _procurar_cama_livre() -> Node3D:
 				menor_dist_sq = d_sq
 				mais_perto = c
 	return mais_perto
+
+func _buscar_tarefa_especializada() -> Vector3:
+	match colono.profissao:
+		"Agricultor":
+			var cm = _buscar_mais_proximo(Global.canteiros_ativos, func(c): return c.construida and c.canteiro_plantado and c.progresso_cultivo >= 100.0 and not c.reservado_colono)
+			if cm:
+				_definir_alvo(cm, "colher_canteiro"); cm.reservado_colono = true; return cm.global_position
+			if (Global.frutas + int(Global.estoque_total_baus.get("frutas", 0))) > 0:
+				var cv = _buscar_mais_proximo(Global.canteiros_ativos, func(c): return c.construida and not c.canteiro_plantado and not c.reservado_colono)
+				if cv:
+					_definir_alvo(cv, "plantar_canteiro"); cv.reservado_colono = true; return cv.global_position
+			var arb = _buscar_mais_proximo("recursos_marcados", func(a): return a.is_in_group("arbustos") and a.tem_frutas and not a.reservado)
+			if arb:
+				_definir_alvo(arb, "arbusto"); arb.reservado = true; return arb.global_position
+		"Construtor":
+			var proj = _buscar_mais_proximo("projetos", func(p): return not p.construida and not p.reservado and p.pode_pagar())
+			if proj:
+				_definir_alvo(proj, "projeto"); proj.reservado = true; return proj.global_position
+		"Coletor":
+			var it = _buscar_mais_proximo("recursos_marcados", func(c): return c.is_in_group("coletaveis_chao") and not c.reservado)
+			if it:
+				_definir_alvo(it, "coletavel"); it.reservado = true; return it.global_position
+			var arv = _buscar_mais_proximo("recursos_marcados", func(a): return a.is_in_group("arvores") and not a.cortada and not a.reservado)
+			if arv:
+				_definir_alvo(arv, "arvore"); arv.reservado = true; return arv.global_position
+			var ped = _buscar_mais_proximo("recursos_marcados", func(r): return r.is_in_group("pedras") and not r.quebrada and not r.reservado)
+			if ped:
+				_definir_alvo(ped, "pedra"); ped.reservado = true; return ped.global_position
+	return Vector3.INF

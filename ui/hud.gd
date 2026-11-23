@@ -16,6 +16,9 @@ var label_lista_colonos: Label
 var botao_contratar: Button
 var btn_ferramentas_equipe: Button
 var btn_mochilas_equipe: Button
+var btn_semear_todos: Button
+var btn_colher_todos: Button
+var botoes_profissao: Array[Button] = []
 var painel_objetivos: PanelContainer
 var label_objetivos: Label
 var _timer_objetivos: float = 0.0
@@ -104,10 +107,28 @@ func _montar_hud_base():
 	btn_mochilas_equipe.add_theme_font_size_override("font_size", 13)
 	btn_mochilas_equipe.pressed.connect(func(): Global.forjar_mochilas_equipe(); _timer_lista_colonos = 0.0)
 	vbox_col.add_child(btn_mochilas_equipe)
+
+	btn_semear_todos = Button.new()
+	btn_semear_todos.add_theme_font_size_override("font_size", 13)
+	btn_semear_todos.pressed.connect(func(): Global.semear_todos_canteiros(); _timer_lista_colonos = 0.0)
+	vbox_col.add_child(btn_semear_todos)
+
+	btn_colher_todos = Button.new()
+	btn_colher_todos.add_theme_font_size_override("font_size", 13)
+	btn_colher_todos.pressed.connect(func(): Global.colher_todos_canteiros(); _timer_lista_colonos = 0.0)
+	vbox_col.add_child(btn_colher_todos)
 	
 	label_lista_colonos = Label.new()
 	label_lista_colonos.add_theme_font_size_override("font_size", 13)
 	vbox_col.add_child(label_lista_colonos)
+	for idx_p in range(8):
+		var btn_p = Button.new()
+		btn_p.add_theme_font_size_override("font_size", 12)
+		btn_p.visible = false
+		var indice_fixo = idx_p
+		btn_p.pressed.connect(func(): _alternar_profissao_indice(indice_fixo))
+		vbox_col.add_child(btn_p)
+		botoes_profissao.append(btn_p)
 
 	flash_dano = ColorRect.new()
 	flash_dano.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -236,6 +257,17 @@ func _process(delta):
 			btn_ferramentas_equipe.disabled = Global.equipe_ferramentas or Global.madeira < 8 or Global.pedra < 6 or Global.couro < 2
 			btn_mochilas_equipe.text = "✅ Mochilas Equipe (30 Cap / +20% Vel)" if Global.equipe_mochilas else "🎒 Mochilas Equipe (6 Couro, 6 Grav)"
 			btn_mochilas_equipe.disabled = Global.equipe_mochilas or Global.couro < 6 or Global.gravetos < 6
+			var vazios := 0; var maduros := 0
+			for c in Global.canteiros_ativos:
+				if is_instance_valid(c) and c.construida:
+					if not c.canteiro_plantado: vazios += 1
+					elif c.progresso_cultivo >= 100.0: maduros += 1
+			btn_semear_todos.visible = Global.canteiros_ativos.size() > 0
+			btn_semear_todos.text = "🌱 Semear Canteiros (" + str(vazios) + " vazios)"
+			btn_semear_todos.disabled = vazios == 0 or (Global.frutas + int(Global.estoque_total_baus.get("frutas", 0))) < 1
+			btn_colher_todos.visible = Global.canteiros_ativos.size() > 0
+			btn_colher_todos.text = "🌾 Colher Canteiros (" + str(maduros) + " prontos)"
+			btn_colher_todos.disabled = maduros == 0
 			var colonos = get_tree().get_nodes_in_group("colonos")
 			var _novo_col = ""
 			if colonos.is_empty():
@@ -249,6 +281,12 @@ func _process(delta):
 			if _novo_col != _ultimo_texto_colonos:
 				_ultimo_texto_colonos = _novo_col
 				label_lista_colonos.text = _novo_col
+			for idx_b in range(botoes_profissao.size()):
+				if idx_b < colonos.size() and is_instance_valid(colonos[idx_b]):
+					botoes_profissao[idx_b].visible = true
+					botoes_profissao[idx_b].text = "🏷 Colono " + str(idx_b + 1) + ": " + colonos[idx_b].profissao + " (Clique p/ mudar)"
+				else:
+					botoes_profissao[idx_b].visible = false
 	else:
 		_timer_lista_colonos = 0.0
 	inventario_ui.atualizar(jogador.inventario_aberto)
@@ -332,3 +370,9 @@ func _atualizar_objetivos_iniciais(delta: float, em_planejador: bool):
 		("[OK] " if tem_cama else "[  ] ") + "Construir Cama [B]\n" +
 		("[OK] " if tem_colono else "[  ] ") + "Contratar Colono (Bancada)"
 	)
+
+func _alternar_profissao_indice(idx: int):
+	var colonos = get_tree().get_nodes_in_group("colonos")
+	if idx >= 0 and idx < colonos.size() and is_instance_valid(colonos[idx]) and colonos[idx].has_method("alternar_profissao"):
+		colonos[idx].alternar_profissao()
+		_timer_lista_colonos = 0.0

@@ -334,3 +334,23 @@ func forjar_mochilas_equipe() -> bool:
 
 func is_noite_de_horda() -> bool:
 	return esta_de_noite() and dia_atual >= 3 and (dia_atual % 3 == 0)
+
+func semear_todos_canteiros() -> int:
+	var plantados := 0
+	for c in canteiros_ativos:
+		if is_instance_valid(c) and c.construida and not c.canteiro_plantado:
+			if c.plantar_canteiro():
+				plantados += 1
+			else:
+				break
+	return plantados
+
+func colher_todos_canteiros() -> int:
+	var total_frutas := 0
+	for c in canteiros_ativos:
+		if is_instance_valid(c) and c.construida and c.canteiro_plantado and c.progresso_cultivo >= 100.0:
+			var qtd = c.colher_canteiro(true)
+			if qtd > 0:
+				frutas += qtd
+				total_frutas += qtd
+	return total_frutas

@@ -42,7 +42,11 @@ var categorias := [
 		"icone": "ðŸ“¦",
 		"itens": [
 			{"nome": "BaÃº", "path": "res://buildings/Bau.tscn", "icone": "ðŸ“¦"},
-			{"nome": "Fogueira", "path": "res://buildings/Fogueira.tscn", "icone": "ðŸ”¥"}
+			{"nome": "Fogueira", "path": "res://buildings/Fogueira.tscn", "icone": "ðŸ”¥"},
+			{"nome": "Cama", "path": "res://buildings/Cama.tscn", "icone": "🛏"},
+			{"nome": "Canteiro", "path": "res://buildings/Canteiro.tscn", "icone": "🌱"},
+			{"nome": "Poço Água", "path": "res://buildings/PocoAgua.tscn", "icone": "🚰"},
+			{"nome": "Curtume", "path": "res://buildings/Curtume.tscn", "icone": "🧵"}
 		]
 	}
 ]

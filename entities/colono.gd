@@ -26,6 +26,20 @@ func obter_carga_mochila() -> int:
 	return total
 
 
+var profissao: String = "Geral"
+const PROFISSOES := ["Geral", "Agricultor", "Construtor", "Coletor"]
+
+func alternar_profissao():
+	var idx = (PROFISSOES.find(profissao) + 1) % PROFISSOES.size()
+	profissao = PROFISSOES[idx]
+	tarefas.limpar_alvos()
+
+func obter_bonus_profissao(tipo_tarefa: String) -> float:
+	if profissao == "Agricultor" and tipo_tarefa in ["colher_canteiro", "plantar_canteiro", "arbusto"]: return 0.75
+	if profissao == "Construtor" and tipo_tarefa == "projeto": return 0.75
+	if profissao == "Coletor" and tipo_tarefa in ["arvore", "pedra", "coletavel"]: return 0.75
+	return 1.0
+
 var esta_trabalhando: bool = false
 var tempo_trabalhando: float = 0.0
 var tempo_tentando: float = 0.0
@@ -82,7 +96,8 @@ func _physics_process(delta):
 		var fator = Global.obter_fator_logistica(alvo_atual.global_position) if is_instance_valid(alvo_atual) else 1.0
 		
 		var mult_ferr = 0.5 if Global.equipe_ferramentas else 1.0
-		if tempo_trabalhando > 0.5 * fator * mult_ferr:
+		var mult_prof = obter_bonus_profissao(tarefas.tipo_alvo)
+		if tempo_trabalhando > 0.5 * fator * mult_ferr * mult_prof:
 			tarefas.concluir_trabalho(fator)
 			esta_trabalhando = false
 			tempo_trabalhando = 0.0
@@ -184,7 +199,7 @@ func _calcular_velocidade_atual() -> float:
 	return VELOCIDADE * mult_moch
 
 func obter_status_texto() -> String:
-	var est = str(int(energia)) + "%"
+	var est = "[" + profissao + "] " + str(int(energia)) + "%"
 	var carga = obter_carga_mochila()
 	if dormindo:
 		agent.set_velocity(Vector3.ZERO)

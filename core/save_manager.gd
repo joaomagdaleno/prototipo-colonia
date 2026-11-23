@@ -53,7 +53,7 @@ func salvar_jogo() -> bool:
 		if is_instance_valid(col):
 			dados["colonos"].append({
 				"pos": [col.global_position.x, col.global_position.y, col.global_position.z],
-				"energia": col.energia,
+				"energia": col.energia, "profissao": col.profissao,
 				"fome": col.fome
 			})
 
