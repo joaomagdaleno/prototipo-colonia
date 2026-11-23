@@ -148,13 +148,17 @@ func obter_dica_mira() -> String:
 				return btn_interagir + " Reparar Muro (" + str(est.vida_atual) + "/" + str(est.vida_maxima) + " HP | 1 Ped)"
 			return "Muro de Pedra (" + str(est.vida_atual) + "/" + str(est.vida_maxima) + " HP)"
 			
-	_atualizar_visual_ferramenta("machado")`n`tif alvo.is_in_group("arvores"):
+	_atualizar_visual_ferramenta("machado")
+	if alvo.is_in_group("arvores"):
 		return btn_bater + " Cortar Árvore (Dano " + str(_calcular_dano_contra(alvo)) + ")"
-	elif alvo.is_in_group("pedras"):`n`t`t_atualizar_visual_ferramenta("picareta")
+	elif alvo.is_in_group("pedras"):
+		_atualizar_visual_ferramenta("picareta")
 		return btn_bater + " Minerar Rocha (Dano " + str(_calcular_dano_contra(alvo)) + ")"
-	elif alvo.is_in_group("animais"):`n`t`t_atualizar_visual_ferramenta("lanca")
+	elif alvo.is_in_group("animais"):
+		_atualizar_visual_ferramenta("lanca")
 		return btn_bater + " Caçar " + alvo.especie.capitalize() + " (Dano " + str(_calcular_dano_contra(alvo)) + ")"
-	elif alvo.is_in_group("inimigos"):`n`t`t_atualizar_visual_ferramenta("lanca")
+	elif alvo.is_in_group("inimigos"):
+		_atualizar_visual_ferramenta("lanca")
 		return btn_bater + " Atacar Criatura (" + str(alvo.vida) + " HP)"
 	elif alvo.is_in_group("arbustos"):
 		return btn_interagir + " Colher Frutas" if ("tem_frutas" in alvo and alvo.tem_frutas) else "Arbusto (Sem frutas)"
@@ -168,9 +172,11 @@ func obter_dica_mira() -> String:
 
 func _calcular_dano_contra(alvo: Node) -> int:
 	var tier := 0
-	_atualizar_visual_ferramenta("machado")`n`tif alvo.is_in_group("arvores"):
+	_atualizar_visual_ferramenta("machado")
+	if alvo.is_in_group("arvores"):
 		tier = Global.tier_machado
-	elif alvo.is_in_group("pedras"):`n`t`t_atualizar_visual_ferramenta("picareta")
+	elif alvo.is_in_group("pedras"):
+		_atualizar_visual_ferramenta("picareta")
 		tier = Global.tier_picareta
 	elif alvo.is_in_group("animais") or alvo.is_in_group("inimigos"):
 		tier = Global.tier_lanca
