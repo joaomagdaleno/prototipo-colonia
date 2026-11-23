@@ -31,6 +31,7 @@ const CAPACIDADE_MAXIMA_BAU: int = 150
 
 var vida_atual: int = 100
 var portao_aberto: bool = false
+var coordenada_grade: Vector2i = Vector2i.ZERO
 
 var construida: bool = false
 var reservado: bool = false
@@ -60,7 +61,8 @@ func _ready():
 		elif has_node("CollisionShape3D"):
 			$CollisionShape3D.queue_free()
 		add_to_group("construidos")
-		Global.estradas_pos[Vector2i(int(round(global_position.x)), int(round(global_position.z)))] = self
+		coordenada_grade = Vector2i(int(round(global_position.x)), int(round(global_position.z)))
+		Global.estradas_pos[coordenada_grade] = self
 		return
 
 	# Projetos fantasmas nï¿½o projetam sombra
@@ -113,7 +115,7 @@ func pode_pagar() -> bool:
 
 func construir() -> bool:
 	if is_in_group("estradas"):
-		Global.estradas_pos.erase(Vector2i(int(round(global_position.x)), int(round(global_position.z))))
+		Global.estradas_pos.erase(coordenada_grade)
 	if construida:
 		return false
 		
@@ -138,7 +140,8 @@ func construir() -> bool:
 	
 	remove_from_group("projetos")
 	add_to_group("construidos")
-	Global.estradas_pos[Vector2i(int(round(global_position.x)), int(round(global_position.z)))] = self
+	coordenada_grade = Vector2i(int(round(global_position.x)), int(round(global_position.z)))
+		Global.estradas_pos[coordenada_grade] = self
 	
 	if luz:
 		luz.visible = true
@@ -210,7 +213,7 @@ func demolir():
 		return
 		
 	if is_in_group("estradas"):
-		Global.estradas_pos.erase(Vector2i(int(round(global_position.x)), int(round(global_position.z))))
+		Global.estradas_pos.erase(coordenada_grade)
 	if construida:
 		Global.madeira += int(custo_madeira / 2.0)
 		Global.pedra += int(custo_pedra / 2.0)
@@ -238,7 +241,7 @@ func demolir():
 
 		
 	if is_in_group("estradas"):
-		Global.estradas_pos.erase(Vector2i(int(round(global_position.x)), int(round(global_position.z))))
+		Global.estradas_pos.erase(coordenada_grade)
 	if construida:
 		Global.madeira += int(custo_madeira / 2.0)
 		Global.pedra += int(custo_pedra / 2.0)

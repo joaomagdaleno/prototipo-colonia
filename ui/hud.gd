@@ -213,21 +213,26 @@ func _process(delta):
 		dock_ui.definir_visivel(jogador.no_modo_construcao)
 
 	if jogador.no_modo_construcao:
-		botao_contratar.text = "ðŸ¤ Contratar Colono (" + str(Global.CUSTO_CONTRATAR_COLONO) + " Comida)" + (" [Y]" if joy else "")
-		botao_contratar.disabled = Global.comida < Global.CUSTO_CONTRATAR_COLONO
-		var colonos = get_tree().get_nodes_in_group("colonos")
-		if colonos.is_empty():
-			label_lista_colonos.text = "ðŸ‘¥ EQUIPE (0)\nNenhum colono contratado."
-		else:
-			var linhas = ["ðŸ‘¥ EQUIPE (" + str(colonos.size()) + ")"]
-			for i in range(colonos.size()):
-				if is_instance_valid(colonos[i]) and colonos[i].has_method("obter_status_texto"):
-					linhas.append("â€¢ Colono " + str(i + 1) + ": " + colonos[i].obter_status_texto())
-			var _novo_col = "\n".join(linhas)
+		_timer_lista_colonos -= delta
+		if _timer_lista_colonos <= 0.0:
+			_timer_lista_colonos = 0.25
+			botao_contratar.text = "🤝 Contratar Colono (" + str(Global.CUSTO_CONTRATAR_COLONO) + " Comida)" + (" [Y]" if joy else "")
+			botao_contratar.disabled = Global.comida < Global.CUSTO_CONTRATAR_COLONO
+			var colonos = get_tree().get_nodes_in_group("colonos")
+			var _novo_col = ""
+			if colonos.is_empty():
+				_novo_col = "👥 EQUIPE (0)\nNenhum colono contratado."
+			else:
+				var linhas = ["👥 EQUIPE (" + str(colonos.size()) + ")"]
+				for i in range(colonos.size()):
+					if is_instance_valid(colonos[i]) and colonos[i].has_method("obter_status_texto"):
+						linhas.append("• Colono " + str(i + 1) + ": " + colonos[i].obter_status_texto())
+				_novo_col = "\n".join(linhas)
 			if _novo_col != _ultimo_texto_colonos:
 				_ultimo_texto_colonos = _novo_col
 				label_lista_colonos.text = _novo_col
-
+	else:
+		_timer_lista_colonos = 0.0
 	inventario_ui.atualizar(jogador.inventario_aberto)
 	if jogador.inventario_aberto or menu_construcao_aberto:
 		mira.visible = false; label_dica_mira.text = ""

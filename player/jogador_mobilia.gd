@@ -93,7 +93,7 @@ func _calcular_snap_modular(pos_alvo: Vector3) -> Vector3:
 		var melhor_encaixe = pos_alvo
 		var menor_dist = 1.3
 		for piso in get_tree().get_nodes_in_group("pisos"):
-			if piso == fantasma_1p or not is_instance_valid(piso): continue
+			if piso == fantasma_1p or not is_instance_valid(piso) or pos_alvo.distance_squared_to(piso.global_position) > 25.0: continue
 			for dir in [Vector3(1,0,0), Vector3(-1,0,0), Vector3(0,0,1), Vector3(0,0,-1)]:
 				var ponto = piso.global_position + dir.rotated(Vector3.UP, piso.rotation.y)
 				var d = Vector2(pos_alvo.x, pos_alvo.z).distance_to(Vector2(ponto.x, ponto.z))
@@ -123,7 +123,7 @@ func _calcular_snap_modular(pos_alvo: Vector3) -> Vector3:
 		var melhor_encaixe = pos_alvo
 		
 		for piso in get_tree().get_nodes_in_group("pisos"):
-			if not is_instance_valid(piso): continue
+			if not is_instance_valid(piso) or pos_alvo.distance_squared_to(piso.global_position) > 25.0: continue
 			for borda in [Vector3(0, 0, 0.5), Vector3(0, 0, -0.5), Vector3(0.5, 0, 0), Vector3(-0.5, 0, 0)]:
 				var ponto = piso.global_position + borda.rotated(Vector3.UP, piso.rotation.y)
 				var d = Vector2(pos_alvo.x, pos_alvo.z).distance_to(Vector2(ponto.x, ponto.z))
@@ -133,7 +133,7 @@ func _calcular_snap_modular(pos_alvo: Vector3) -> Vector3:
 					rotacao_mobilia = piso.rotation.y + (PI/2.0 if abs(borda.x) > 0.0 else 0.0)
 					
 		for p in paredes:
-			if p == fantasma_1p or not is_instance_valid(p): continue
+			if p == fantasma_1p or not is_instance_valid(p) or pos_alvo.distance_squared_to(p.global_position) > 25.0: continue
 			for dir in [Vector3(1.0, 0, 0), Vector3(-1.0, 0, 0)]:
 				var ponto = p.global_position + dir.rotated(Vector3.UP, p.rotation.y)
 				var d = pos_alvo.distance_to(ponto)
@@ -148,7 +148,7 @@ func _calcular_snap_modular(pos_alvo: Vector3) -> Vector3:
 		var menor_dist = 2.0
 		var melhor_encaixe = pos_alvo
 		for p in get_tree().get_nodes_in_group("paredes"):
-			if not is_instance_valid(p): continue
+			if not is_instance_valid(p) or pos_alvo.distance_squared_to(p.global_position) > 25.0: continue
 			var topo_parede = p.global_position + Vector3(0, 2.4, 0)
 			var d = pos_alvo.distance_to(topo_parede)
 			if d < menor_dist:
