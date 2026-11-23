@@ -3,17 +3,17 @@
 [ext_resource type="Script" path="res://buildings/estrutura_construivel.gd" id="1_8hkeh"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_parede"]
-size = Vector3(2.0, 2.4, 0.2)
+size = Vector3(1.0, 2.4, 0.2)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_madeira"]
 albedo_color = Color(0.55, 0.36, 0.2, 1)
 roughness = 0.85
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_parede"]
-size = Vector3(2.0, 2.4, 0.2)
+size = Vector3(1.0, 2.4, 0.2)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_interacao"]
-size = Vector3(2.4, 2.6, 0.8)
+size = Vector3(1.2, 2.6, 0.8)
 
 [node name="ParedeMadeira" type="Node3D" unique_id=748192001 groups=["paredes"]]
 script = ExtResource("1_8hkeh")

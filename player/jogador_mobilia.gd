@@ -145,17 +145,47 @@ func _calcular_snap_modular(pos_alvo: Vector3) -> Vector3:
 
 	# 4. Snap para Tetos (encaixa no topo de Paredes a 2.4m de altura)
 	if fantasma_1p.is_in_group("tetos") or ("is_teto" in fantasma_1p and fantasma_1p.is_teto):
-		var menor_dist = 2.0
+		var menor_dist = 1.6
 		var melhor_encaixe = pos_alvo
-		for p in get_tree().get_nodes_in_group("paredes"):
-			if not is_instance_valid(p) or pos_alvo.distance_squared_to(p.global_position) > 25.0: continue
-			var topo_parede = p.global_position + Vector3(0, 2.4, 0)
-			var d = pos_alvo.distance_to(topo_parede)
+		for piso in get_tree().get_nodes_in_group("pisos"):
+			if not is_instance_valid(piso) or pos_alvo.distance_squared_to(piso.global_position) > 25.0: continue
+			var topo_piso = piso.global_position + Vector3(0, 2.4, 0)
+			var d = Vector2(pos_alvo.x, pos_alvo.z).distance_to(Vector2(topo_piso.x, topo_piso.z))
 			if d < menor_dist:
 				menor_dist = d
-				melhor_encaixe = topo_parede
-				rotacao_mobilia = p.rotation.y
+				melhor_encaixe = topo_piso
+				rotacao_mobilia = piso.rotation.y
+		for t in get_tree().get_nodes_in_group("tetos"):
+			if t == fantasma_1p or not is_instance_valid(t) or pos_alvo.distance_squared_to(t.global_position) > 25.0: continue
+			for dir in [Vector3(1,0,0), Vector3(-1,0,0), Vector3(0,0,1), Vector3(0,0,-1)]:
+				var ponto = t.global_position + dir.rotated(Vector3.UP, t.rotation.y)
+				var d = Vector2(pos_alvo.x, pos_alvo.z).distance_to(Vector2(ponto.x, ponto.z))
+				if d < menor_dist:
+					menor_dist = d
+					melhor_encaixe = ponto
+					rotacao_mobilia = t.rotation.y
 		return melhor_encaixe
+
+	# 5. Snap lateral para Muros de Pedra (1.0m)
+	if "is_muro" in fantasma_1p and fantasma_1p.is_muro:
+		var menor_dist = 1.4
+		var melhor_encaixe = pos_alvo
+		for m in get_tree().get_nodes_in_group("construidos") + get_tree().get_nodes_in_group("projetos"):
+			if m == fantasma_1p or not is_instance_valid(m) or not ("is_muro" in m and m.is_muro): continue
+			for dir in [Vector3(1.0, 0, 0), Vector3(-1.0, 0, 0)]:
+				var ponto = m.global_position + dir.rotated(Vector3.UP, m.rotation.y)
+				var d = pos_alvo.distance_to(ponto)
+				if d < menor_dist:
+					menor_dist = d
+					melhor_encaixe = ponto
+					rotacao_mobilia = m.rotation.y
+		return melhor_encaixe
+
+	# 6. Apoiar moveis/estruturas sobre Pisos sem afundar
+	for piso in get_tree().get_nodes_in_group("pisos"):
+		if is_instance_valid(piso) and abs(pos_alvo.x - piso.global_position.x) <= 0.55 and abs(pos_alvo.z - piso.global_position.z) <= 0.55:
+			pos_alvo.y = max(pos_alvo.y, piso.global_position.y + 0.1)
+			break
 
 	return pos_alvo
 

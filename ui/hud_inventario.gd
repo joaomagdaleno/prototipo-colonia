@@ -102,7 +102,7 @@ func atualizar(deve_mostrar: bool):
 	var status_equip = "Machado T" + str(Global.tier_machado) + " | Picareta T" + str(Global.tier_picareta) + " | Lança T" + str(Global.tier_lanca)
 	var status_mochila = "Mochila Couro (+25% Vel / +1 Coleta)" if Global.tem_mochila_couro else "Sem Mochila"
 	var status_cura = "ATIVA (+2 HP/s)" if (Global.saciedade_jogador >= 70.0 and Global.hidratacao_jogador >= 70.0 and Global.tempo_sem_combate >= 6.0) else "Inativa (Requer >=70% Fome/Sede e paz)"
-	var dica = "[D-Pad Cima / Start] Fechar  |  [Y] Melhorar Ferramenta" if Global.usando_joystick else "[I / ESC] Fechar  |  [Clique] Usar/Fabricar"
+	var dica = "[B / Círculo / Start] Fechar  |  [D-Pad] Navegar  |  [Y] Melhorar" if Global.usando_joystick else "[I / ESC] Fechar  |  [Clique] Usar/Fabricar"
 
 	label_conteudo.text = (
 		"=== INVENTÁRIO & FORJA DE TIERS ===\n" +
@@ -159,6 +159,20 @@ func atualizar(deve_mostrar: bool):
 
 	if not estava_aberto:
 		btn_comer_refeicao.grab_focus()
+
+func _input(event):
+	if not painel.visible or get_tree().paused:
+		return
+	var fechou := false
+	if event is InputEventKey and event.pressed and not event.echo and (event.keycode == KEY_I or event.keycode == KEY_ESCAPE):
+		fechou = true
+	elif event is InputEventJoypadButton and event.pressed and (event.button_index == JOY_BUTTON_B or event.button_index == JOY_BUTTON_START):
+		fechou = true
+	if fechou:
+		var jogador = get_tree().current_scene.get_node_or_null("Jogador")
+		if is_instance_valid(jogador) and jogador.inventario_aberto:
+			jogador._alternar_inventario()
+		get_viewport().set_input_as_handled()
 
 func _unhandled_input(event):
 	if painel.visible and not get_tree().paused and event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_Y:

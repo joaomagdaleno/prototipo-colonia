@@ -221,20 +221,24 @@ func cozinhar() -> bool:
 		print("🌧 A fogueira apagou por causa da chuva! Construa um teto acima dela.")
 		return false
 		
-	if Global.carne_crua >= 1:
-		Global.carne_crua -= 1
+	if _obter_total_disponivel("carne_crua") >= 1:
+		_consumir_recurso_global_ou_bau("carne_crua", 1)
 		Global.comida += 8
+		AudioManager.tocar("coleta")
+		if is_instance_valid(luz): luz.light_energy = 5.0
 		print("🍖 Carne assada na fogueira! -1 Carne Crua | +8 Comida Pronta")
 		return true
-		
-	elif Global.frutas >= 2:
-		Global.frutas -= 2
+
+	elif _obter_total_disponivel("frutas") >= 2:
+		_consumir_recurso_global_ou_bau("frutas", 2)
 		Global.comida += 5
+		AudioManager.tocar("coleta")
+		if is_instance_valid(luz): luz.light_energy = 5.0
 		print("🍲 Frutas cozidas! -2 Frutas | +5 Comida Pronta")
 		return true
-		
+
 	else:
-		print("Vocï¿½ precisa de pelo menos 2 frutas cruas para cozinhar na fogueira!")
+		print("Você precisa de 1 Carne Crua ou 2 Frutas para cozinhar na fogueira!")
 		return false
 
 func demolir():

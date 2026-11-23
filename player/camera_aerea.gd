@@ -108,7 +108,7 @@ func _process(delta):
 			pincel.atualizar(pos_bruta)
 		elif is_instance_valid(fantasma):
 			pincel.ocultar()
-			var pos = Vector3(round(pos_bruta.x), pos_bruta.y + 0.5, round(pos_bruta.z))
+			var pos = Vector3(round(pos_bruta.x), pos_bruta.y, round(pos_bruta.z))
 			fantasma.visible = true
 			fantasma.global_position = pos
 			fantasma.rotation.y = rotacao_atual

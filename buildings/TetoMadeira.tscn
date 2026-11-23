@@ -3,17 +3,17 @@
 [ext_resource type="Script" path="res://buildings/estrutura_construivel.gd" id="1_8hkeh"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_teto"]
-size = Vector3(2.0, 0.15, 2.0)
+size = Vector3(1.0, 0.15, 1.0)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_teto"]
 albedo_color = Color(0.48, 0.32, 0.18, 1)
 roughness = 0.9
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_teto"]
-size = Vector3(2.0, 0.15, 2.0)
+size = Vector3(1.0, 0.15, 1.0)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_interacao"]
-size = Vector3(2.2, 0.6, 2.2)
+size = Vector3(1.1, 0.6, 1.1)
 
 [node name="TetoMadeira" type="Node3D" unique_id=748192002 groups=["tetos"]]
 script = ExtResource("1_8hkeh")

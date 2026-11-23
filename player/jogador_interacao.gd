@@ -15,7 +15,15 @@ func executar_golpe():
 	if raycast.is_colliding():
 		var alvo = raycast.get_collider()
 		if alvo.has_method("receber_dano"):
-			var dano = _calcular_dano_contra(alvo)
+			if alvo.is_in_group("arvores") and Global.tier_machado <= 0:
+			AudioManager.tocar("dano")
+			print("🪓 Você precisa fabricar um Machado de Pedra no Inventário [I] para cortar árvores!")
+			return
+		if alvo.is_in_group("pedras") and Global.tier_picareta <= 0:
+			AudioManager.tocar("dano")
+			print("⛏ Você precisa fabricar uma Picareta de Pedra no Inventário [I] para minerar rochas!")
+			return
+		var dano = _calcular_dano_contra(alvo)
 			AudioManager.tocar("golpe")
 			alvo.receber_dano(dano)
 			return
@@ -136,7 +144,11 @@ func obter_dica_mira() -> String:
 				return btn_interagir + " Colher Cultivo (+4 Frutas)"
 			return "🌱 Cultivando... " + str(int(est.progresso_cultivo)) + "%"
 		elif est.is_fogueira:
-			return btn_interagir + " Cozinhar (1 Carne -> 8 Comida | 2 Frutas -> 5)"
+			if (Global.carne_crua + int(Global.estoque_total_baus.get("carne_crua", 0))) >= 1:
+				return btn_interagir + " Assar Carne (1 Carne -> +8 Comida)"
+			elif (Global.frutas + int(Global.estoque_total_baus.get("frutas", 0))) >= 2:
+				return btn_interagir + " Cozinhar Frutas (2 Frutas -> +5 Comida)"
+			return "Fogueira (Precisa de 1 Carne Crua ou 2 Frutas)"
 		elif est.is_cama:
 			return btn_interagir + " Dormir até Amanhecer" if Global.esta_de_noite() else "Cama (Disponível à noite)"
 		elif est.is_portao:
@@ -150,9 +162,13 @@ func obter_dica_mira() -> String:
 			
 	_atualizar_visual_ferramenta("machado")
 	if alvo.is_in_group("arvores"):
+		if Global.tier_machado <= 0:
+			return "🪓 Requer Machado de Pedra [I]"
 		return btn_bater + " Cortar Árvore (Dano " + str(_calcular_dano_contra(alvo)) + ")"
 	elif alvo.is_in_group("pedras"):
 		_atualizar_visual_ferramenta("picareta")
+		if Global.tier_picareta <= 0:
+			return "⛏ Requer Picareta de Pedra [I]"
 		return btn_bater + " Minerar Rocha (Dano " + str(_calcular_dano_contra(alvo)) + ")"
 	elif alvo.is_in_group("animais"):
 		_atualizar_visual_ferramenta("lanca")

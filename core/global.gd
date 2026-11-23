@@ -41,7 +41,7 @@ var usando_joystick: bool = false
 # Tempo e Clima
 var hora_do_dia: float = 8.0
 var dia_atual: int = 1
-const VELOCIDADE_TEMPO: float = 0.25
+const VELOCIDADE_TEMPO: float = 0.04
 enum Clima { ENSOLARADO, NUBLADO, CHUVA, TEMPESTADE }
 var clima_atual: Clima = Clima.ENSOLARADO
 var _tempo_proximo_clima: float = 45.0
@@ -88,7 +88,8 @@ func _process(delta):
 	# 1. Ciclo Dia e Noite
 	hora_do_dia += VELOCIDADE_TEMPO * delta
 	if hora_do_dia >= 24.0:
-		hora_do_dia = 0.0
+		hora_do_dia -= 24.0
+		dia_atual += 1
 
 	# 2. Variação Climática
 	_tempo_proximo_clima -= delta
@@ -111,8 +112,8 @@ func _process(delta):
 		_processar_metabolismo()
 
 func _processar_metabolismo():
-	saciedade_jogador = max(0.0, saciedade_jogador - 0.22)
-	hidratacao_jogador = max(0.0, hidratacao_jogador - 0.32)
+	saciedade_jogador = max(0.0, saciedade_jogador - 0.10)
+	hidratacao_jogador = max(0.0, hidratacao_jogador - 0.14)
 
 	# Cura passiva se bem alimentado, hidratado e fora de perigo
 	if saciedade_jogador >= 70.0 and hidratacao_jogador >= 70.0 and tempo_sem_combate >= 6.0:
