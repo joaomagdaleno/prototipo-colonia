@@ -52,21 +52,21 @@ func executar_interacao():
 				else:
 					print("Só é possível dormir durante a noite (após 20:00).")
 			elif estrutura.is_curtume and estrutura.construida:
-			estrutura.curtir_material()
-		elif estrutura.is_poco and estrutura.construida:
-			Global.beber_agua_jogador()
-			AudioManager.tocar("coleta")
-		elif estrutura.is_canteiro and estrutura.construida:
-			if not estrutura.canteiro_plantado:
-				if not estrutura.plantar_canteiro():
-					print("Voce precisa de pelo menos 1 Fruta para plantar!")
-			elif estrutura.progresso_cultivo >= 100.0:
-				var colhidas = estrutura.colher_canteiro(true)
-				Global.frutas += colhidas
-				print("Colheu +", colhidas, " Frutas do canteiro!")
-			else:
-				print("Cultivo em andamento: ", int(estrutura.progresso_cultivo), "%")
-		elif estrutura.is_fogueira and estrutura.construida:
+				estrutura.curtir_material()
+			elif estrutura.is_poco and estrutura.construida:
+				Global.beber_agua_jogador()
+				AudioManager.tocar("coleta")
+			elif estrutura.is_canteiro and estrutura.construida:
+				if not estrutura.canteiro_plantado:
+					if not estrutura.plantar_canteiro():
+						print("Voce precisa de pelo menos 1 Fruta para plantar!")
+				elif estrutura.progresso_cultivo >= 100.0:
+					var colhidas = estrutura.colher_canteiro(true)
+					Global.frutas += colhidas
+					print("Colheu +", colhidas, " Frutas do canteiro!")
+				else:
+					print("Cultivo em andamento: ", int(estrutura.progresso_cultivo), "%")
+			elif estrutura.is_fogueira and estrutura.construida:
 				estrutura.cozinhar()
 			elif estrutura.is_portao and estrutura.construida:
 				estrutura.alternar_portao()

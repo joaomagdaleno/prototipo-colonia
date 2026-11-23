@@ -18,7 +18,6 @@ config/icon="res://icon.svg"
 [autoload]
 
 AudioManager="*res://core/audio_manager.gd"
-
 Global="*res://core/global.gd"
 SaveManager="*res://core/save_manager.gd"
 
@@ -27,19 +26,6 @@ SaveManager="*res://core/save_manager.gd"
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
-[input_devices]
-
-sensors/enable_accelerometer=false
-sensors/enable_gravity=false
-sensors/enable_gyroscope=false
-sensors/enable_magnetometer=false
-
 [physics]
 
 3d/physics_engine="Jolt Physics"
-
-[rendering]
-
-rendering_device/driver.windows="vulkan"
-scaling_3d/mode=0
-scaling_3d/scale=1.0

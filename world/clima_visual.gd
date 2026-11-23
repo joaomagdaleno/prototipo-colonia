@@ -22,8 +22,8 @@ func _otimizar_sol_vega8():
 	# Suaviza a transiï¿½ï¿½o de sombra sem pesar na GPU
 	sol.directional_shadow_blend_splits = false
 
-func _criar_particulas_chuva()
-	_jogador = get_parent().get_node_or_null("Jogador"):
+func _criar_particulas_chuva():
+	_jogador = get_parent().get_node_or_null("Jogador")
 	particulas = GPUParticles3D.new()
 	particulas.amount = 220 # Leve para manter 60 FPS na Vega 8
 	particulas.lifetime = 1.1
