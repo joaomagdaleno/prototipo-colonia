@@ -277,10 +277,10 @@ func _obter_nome_mobilia_1p() -> String:
 	return "Nenhum"
 
 func mostrar_flash_dano():
-if not is_instance_valid(flash_dano): return
-flash_dano.color.a = 0.35
-var tween = create_tween()
-tween.tween_property(flash_dano, "color:a", 0.0, 0.35)
+	if not is_instance_valid(flash_dano): return
+	flash_dano.color.a = 0.35
+	var tween = create_tween()
+	tween.tween_property(flash_dano, "color:a", 0.0, 0.35)
 func _atualizar_objetivos_iniciais(delta: float, em_planejador: bool):
 	if _objetivos_concluidos or not is_instance_valid(painel_objetivos): return
 	if em_planejador:

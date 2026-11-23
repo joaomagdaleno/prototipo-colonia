@@ -38,6 +38,8 @@ func _ready():
 	add_to_group("colonos")
 	agent.path_desired_distance = 0.5
 	agent.target_desired_distance = 0.5
+	agent.avoidance_enabled = true
+	agent.radius = 0.4
 	_otimizar_renderizacao_vega8()
 	posicao_anterior = global_position
 

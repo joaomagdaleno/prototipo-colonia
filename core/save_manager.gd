@@ -145,6 +145,8 @@ func carregar_jogo() -> bool:
 				inst.vida_atual = int(item["vida_atual"])
 			if item.has("estoque_bau") and "estoque_bau" in inst and inst.is_bau:
 				inst.estoque_bau = item["estoque_bau"].duplicate()
+				if not inst in Global.baus_ativos:
+					Global.baus_ativos.append(inst)
 				for k in inst.estoque_bau.keys():
 					Global.estoque_total_baus[k] = int(Global.estoque_total_baus.get(k, 0)) + int(inst.estoque_bau[k])
 				

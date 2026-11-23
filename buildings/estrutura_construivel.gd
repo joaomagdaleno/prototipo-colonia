@@ -32,6 +32,7 @@ const CAPACIDADE_MAXIMA_BAU: int = 150
 var vida_atual: int = 100
 var portao_aberto: bool = false
 var coordenada_grade: Vector2i = Vector2i.ZERO
+var obstaculo_nav: NavigationObstacle3D = null
 
 var construida: bool = false
 var reservado: bool = false
@@ -171,6 +172,7 @@ func construir() -> bool:
 		$AreaInteracao.queue_free()
 		
 	AudioManager.tocar("construir")
+	_configurar_obstaculo_navegacao()
 	Global.atualizar_navmesh_otimizado()
 	return true
 
@@ -233,7 +235,8 @@ func demolir():
 		else:
 			print("Estrutura demolida! Metade dos recursos devolvida.")
 			
-		Global.atualizar_navmesh_otimizado()
+		_configurar_obstaculo_navegacao()
+	Global.atualizar_navmesh_otimizado()
 	else:
 		print("Projeto cancelado: ", name)
 		
@@ -248,7 +251,8 @@ func demolir():
 		Global.gravetos += int(custo_gravetos / 2.0)
 		Global.pedrinhas += int(custo_pedrinhas / 2.0)
 		print("Estrutura demolida! Metade dos recursos devolvida.")
-		Global.atualizar_navmesh_otimizado()
+		_configurar_obstaculo_navegacao()
+	Global.atualizar_navmesh_otimizado()
 	else:
 		print("Projeto cancelado: ", name)
 		
@@ -272,6 +276,8 @@ func alternar_portao():
 	if not construida or not is_portao:
 		return
 	portao_aberto = not portao_aberto
+	if is_instance_valid(obstaculo_nav):
+		obstaculo_nav.avoidance_enabled = not portao_aberto
 	AudioManager.tocar("portao")
 	
 	# Desativa colisï¿½o quando aberto para jogador e colonos passarem livres
@@ -296,7 +302,8 @@ func receber_dano_estrutura(dano: int):
 	
 	if vida_atual <= 0:
 		print("?? Estrutura destruï¿½da pelos inimigos!")
-		Global.atualizar_navmesh_otimizado()
+		_configurar_obstaculo_navegacao()
+	Global.atualizar_navmesh_otimizado()
 		queue_free()
 
 func reparar() -> bool:
@@ -435,3 +442,13 @@ func _aplicar_visual_low_poly():
 	else:
 		return
 	mesh.material_override = mat
+
+func _configurar_obstaculo_navegacao():
+	if not (is_parede or is_muro or is_portao or is_bancada or is_bau): return
+	if not is_instance_valid(obstaculo_nav):
+		obstaculo_nav = NavigationObstacle3D.new()
+		obstaculo_nav.radius = 0.65
+		obstaculo_nav.height = 2.0
+		obstaculo_nav.use_3d_avoidance = false
+		add_child(obstaculo_nav)
+	obstaculo_nav.avoidance_enabled = not (is_portao and portao_aberto)

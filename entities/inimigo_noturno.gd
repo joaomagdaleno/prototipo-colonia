@@ -24,6 +24,9 @@ func _ready():
 	add_to_group("inimigos")
 	jogador = get_tree().current_scene.get_node_or_null("Jogador")
 	_timer_fogueira = randf_range(0.05, 0.25)
+	if is_instance_valid(agent):
+		agent.avoidance_enabled = true
+		agent.radius = 0.45
 	_timer_repensar_caminho = randf_range(0.05, 0.35)
 	_otimizar_renderizacao_vega8()
 
