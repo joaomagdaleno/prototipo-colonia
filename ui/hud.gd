@@ -138,8 +138,8 @@ func _montar_hud_base():
 
 	painel_objetivos = PanelContainer.new()
 	painel_objetivos.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	painel_objetivos.offset_left = -290; painel_objetivos.offset_top = 20
-	painel_objetivos.offset_right = -20; painel_objetivos.offset_bottom = 145
+	painel_objetivos.offset_left = -290; painel_objetivos.offset_top = 66
+	painel_objetivos.offset_right = -20; painel_objetivos.offset_bottom = 195
 	painel_objetivos.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(painel_objetivos)
 	var m_obj = MarginContainer.new()
