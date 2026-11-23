@@ -54,6 +54,7 @@ func _obter_raio_chao() -> float:
 func _obter_altura_chao(pos_x: float, pos_z: float) -> float:
 	var space_state = get_world_3d().direct_space_state
 	var query = PhysicsRayQueryParameters3D.create(Vector3(pos_x, 50.0, pos_z), Vector3(pos_x, -50.0, pos_z))
+	query.collision_mask = 1
 	var resultado = space_state.intersect_ray(query)
 	return resultado.position.y if resultado else 0.0
 
