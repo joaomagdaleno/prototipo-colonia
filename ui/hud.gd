@@ -19,6 +19,8 @@ var label_objetivos: Label
 var _timer_objetivos: float = 0.0
 var _objetivos_concluidos: bool = false
 var _timer_lista_colonos: float = 0.0
+var _timer_mira: float = 0.0
+var _ultimo_texto_mira: String = ""
 
 @onready var inventario_ui = $InventarioUI
 @onready var construcao_menu_ui = $ConstrucaoMenuUI
@@ -254,7 +256,13 @@ func _process(delta):
 		label_modo.text = "|  1Âª PESSOA"
 		label_atalhos.text = "[R2] Cortar/CaÃ§ar | [X] Interagir | [D-Pad â–¼] Guia [B] | [D-Pad â–²] InventÃ¡rio | [Start] Pausa" if joy else "[Esq] Cortar/CaÃ§ar | [E] Interagir | [B] Guia de ConstruÃ§Ã£o | [I] InventÃ¡rio | [ESC] Pausa"
 		mira.visible = true
-		label_dica_mira.text = jogador.obter_dica_mira()
+		_timer_mira -= delta
+	if _timer_mira <= 0.0:
+		_timer_mira = 0.05
+		var _nova_mira = jogador.obter_dica_mira()
+		if _nova_mira != _ultimo_texto_mira:
+			_ultimo_texto_mira = _nova_mira
+			label_dica_mira.text = _nova_mira
 
 func _formatar_custo(est: EstruturaConstruivel) -> String:
 	var partes = []

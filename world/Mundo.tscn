@@ -68,7 +68,8 @@ script = ExtResource("3_w05dh")
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=519888196 groups=["navegavel"]]
 navigation_mesh = ExtResource("4_7dq3s")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D" unique_id=95232936 groups=["navegavel"]]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D" unique_id=95232936 groups=["navegavel"]
+visible = false]
 visible = false
 mesh = SubResource("BoxMesh_pecf4")
 

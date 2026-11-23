@@ -2,11 +2,13 @@ extends Node3D
 
 var particulas: GPUParticles3D
 var sol: DirectionalLight3D
+var _jogador: Node3D
 
 func _ready():
 	sol = get_parent().get_node_or_null("DirectionalLight3D")
 	_otimizar_sol_vega8()
 	_criar_particulas_chuva()
+	_jogador = get_parent().get_node_or_null("Jogador")
 
 func _otimizar_sol_vega8():
 	if not is_instance_valid(sol):
@@ -18,7 +20,8 @@ func _otimizar_sol_vega8():
 	# Suaviza a transiï¿½ï¿½o de sombra sem pesar na GPU
 	sol.directional_shadow_blend_splits = false
 
-func _criar_particulas_chuva():
+func _criar_particulas_chuva()
+	_jogador = get_parent().get_node_or_null("Jogador"):
 	particulas = GPUParticles3D.new()
 	particulas.amount = 220 # Leve para manter 60 FPS na Vega 8
 	particulas.lifetime = 1.1
@@ -50,13 +53,13 @@ func _criar_particulas_chuva():
 
 func _process(delta):
 	var chovendo = Global.esta_chovendo()
-	particulas.emitting = chovendo
-	
-	# Sï¿½ atualiza a posiï¿½ï¿½o das partï¿½culas quando realmente estiver chovendo
-	if chovendo:
-		var cam_ativa = get_viewport().get_camera_3d()
-		if is_instance_valid(cam_ativa):
-			global_position = cam_ativa.global_position + Vector3(0, 10, 0)
+	var em_planejador = is_instance_valid(_jogador) and "no_modo_construcao" in _jogador and _jogador.no_modo_construcao
+	var mostrar_chuva = chovendo and not em_planejador
+	particulas.emitting = mostrar_chuva
+	particulas.visible = mostrar_chuva
+
+	if mostrar_chuva and is_instance_valid(_jogador):
+		global_position = _jogador.global_position + Vector3(0, 10, 0)
 	
 	# Escurece suavemente a luz do sol durante tempo nublado ou chuva
 	if is_instance_valid(sol):
