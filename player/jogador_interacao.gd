@@ -16,18 +16,18 @@ func executar_golpe():
 		var alvo = raycast.get_collider()
 		if alvo.has_method("receber_dano"):
 			if alvo.is_in_group("arvores") and Global.tier_machado <= 0:
-			AudioManager.tocar("dano")
-			print("🪓 Você precisa fabricar um Machado de Pedra no Inventário [I] para cortar árvores!")
-			return
-		if alvo.is_in_group("pedras") and Global.tier_picareta <= 0:
-			AudioManager.tocar("dano")
-			print("⛏ Você precisa fabricar uma Picareta de Pedra no Inventário [I] para minerar rochas!")
-			return
-		var dano = _calcular_dano_contra(alvo)
+				AudioManager.tocar("dano")
+				print("🪓 Você precisa fabricar um Machado de Pedra no Inventário [I] para cortar árvores!")
+				return
+			if alvo.is_in_group("pedras") and Global.tier_picareta <= 0:
+				AudioManager.tocar("dano")
+				print("⛏ Você precisa fabricar uma Picareta de Pedra no Inventário [I] para minerar rochas!")
+				return
+			var dano = _calcular_dano_contra(alvo)
 			AudioManager.tocar("golpe")
 			alvo.receber_dano(dano)
 			return
-			
+
 		var est: EstruturaConstruivel = alvo if alvo is EstruturaConstruivel else (alvo.get_parent() as EstruturaConstruivel)
 		if est and est.construida and (est.is_portao or est.is_muro) and est.vida_atual < est.vida_maxima:
 			est.reparar()
