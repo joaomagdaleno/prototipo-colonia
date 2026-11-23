@@ -173,7 +173,7 @@ func carregar_jogo() -> bool:
 		var pos = c_data["pos"]
 		novo_col.global_position = Vector3(pos[0], pos[1], pos[2])
 		novo_col.energia = float(c_data.get("energia", 100.0))
-			novo_col.profissao = str(c_data.get("profissao", "Geral"))
+		novo_col.profissao = str(c_data.get("profissao", "Geral"))
 		novo_col.fome = float(c_data.get("fome", 0.0))
 
 	if dados.has("natureza_viva"):
