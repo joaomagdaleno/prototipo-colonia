@@ -16,19 +16,19 @@ func _ready():
 	add_child(vbox)
 	
 	var titulo = Label.new()
-	titulo.text = "SOBREVIVÃŠNCIA & COLÃ”NIA"
+	titulo.text = "SOBREVIVÊNCIA & COLÔNIA"
 	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	titulo.add_theme_font_size_override("font_size", 26)
 	vbox.add_child(titulo)
 	
 	var btn_novo = Button.new()
-	btn_novo.text = "ðŸŒ² Novo Jogo"
+	btn_novo.text = "🌲 Novo Jogo"
 	btn_novo.add_theme_font_size_override("font_size", 18)
 	btn_novo.pressed.connect(func(): Global.iniciar_novo_jogo())
 	vbox.add_child(btn_novo)
 	
 	var btn_carregar = Button.new()
-	btn_carregar.text = "ðŸ“‚ Carregar Jogo Salvo"
+	btn_carregar.text = "📂 Carregar Jogo Salvo"
 	btn_carregar.add_theme_font_size_override("font_size", 18)
 	btn_carregar.disabled = not Global.tem_save()
 	btn_carregar.pressed.connect(func():
@@ -38,7 +38,7 @@ func _ready():
 	vbox.add_child(btn_carregar)
 	
 	var btn_sair = Button.new()
-	btn_sair.text = "âŒ Sair para o Windows"
+	btn_sair.text = "❌ Sair para o Windows"
 	btn_sair.add_theme_font_size_override("font_size", 18)
 	btn_sair.pressed.connect(func(): get_tree().quit())
 	vbox.add_child(btn_sair)

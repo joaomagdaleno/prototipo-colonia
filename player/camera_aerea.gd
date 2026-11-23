@@ -1,6 +1,6 @@
 extends Camera3D
 
-## CÃ¢mera AÃ©rea / Modo EstratÃ©gico de Planejamento e ConstruÃ§Ã£o
+## Câmera Aérea / Modo Estratégico de Planejamento e Construção
 
 @export var opcoes_construcao: Array[PackedScene]
 var indice_atual: int = 0
@@ -74,7 +74,7 @@ func _process(delta):
 	if is_instance_valid(grade_visual):
 		grade_visual.visible = not pincel.ativo
 
-	# 1. MovimentaÃ§Ã£o e Limites da CÃ¢mera
+	# 1. Movimentação e Limites da Câmera
 	var input_dir = Input.get_vector("mover_esquerda", "mover_direita", "mover_frente", "mover_tras")
 	if input_dir.length() > 0:
 		if Input.get_connected_joypads().size() > 0 and not Input.is_key_pressed(KEY_W) and not Input.is_key_pressed(KEY_A) and not Input.is_key_pressed(KEY_S) and not Input.is_key_pressed(KEY_D):
@@ -92,7 +92,7 @@ func _process(delta):
 	global_position.z = clamp(global_position.z, -LIMITE_MAPA_XZ, LIMITE_MAPA_XZ)
 	global_position.y = clamp(global_position.y, ALTURA_MIN_ZOOM, ALTURA_MAX_ZOOM)
 
-	# 2. InterseÃ§Ã£o com o Terreno (Raycast)
+	# 2. Interseção com o Terreno (Raycast)
 	var pos_tela = (get_viewport().get_visible_rect().size / 2.0) if usando_controle else get_viewport().get_mouse_position()
 	var origem = project_ray_origin(pos_tela)
 	var query = PhysicsRayQueryParameters3D.create(origem, origem + project_ray_normal(pos_tela) * 120.0)

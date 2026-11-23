@@ -24,7 +24,7 @@ func _ready():
 	add_child(_timer_regenerar)
 
 func _configurar_copa_e_frutas():
-	# Desativa sombras e aplica limite de visÃ£o leve para a Radeon Vega 8
+	# Desativa sombras e aplica limite de visão leve para a Radeon Vega 8
 	for mesh in [tronco_mesh, copa_mesh]:
 		if is_instance_valid(mesh):
 			mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -36,7 +36,7 @@ func _configurar_copa_e_frutas():
 	if not is_instance_valid(copa_mesh):
 		return
 
-	# Cria um nÃ³ agrupador na altura da Copa com 5 frutinhas vermelhas
+	# Cria um nó agrupador na altura da Copa com 5 frutinhas vermelhas
 	grupo_frutas = Node3D.new()
 	grupo_frutas.position = copa_mesh.position
 	add_child(grupo_frutas)
@@ -74,7 +74,7 @@ func alternar_marcacao(ativar: bool):
 # Chamado pelo Jogador (apertando E/X) ou pelo Colono
 func colher():
 	if not tem_frutas:
-		print("Este arbusto ainda nÃ£o tem frutas!")
+		print("Este arbusto ainda não tem frutas!")
 		return
 		
 	tem_frutas = false

@@ -31,37 +31,37 @@ func _ready():
 	margem.add_child(vbox)
 	
 	var titulo = Label.new()
-	titulo.text = "â¸ï¸ JOGO PAUSADO"
+	titulo.text = "⏸️ JOGO PAUSADO"
 	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	titulo.add_theme_font_size_override("font_size", 22)
 	vbox.add_child(titulo)
 	
 	btn_continuar = Button.new()
-	btn_continuar.text = "â–¶ï¸ Continuar"
+	btn_continuar.text = "▶️ Continuar"
 	btn_continuar.add_theme_font_size_override("font_size", 16)
 	btn_continuar.pressed.connect(func(): get_parent().alternar_pausa())
 	vbox.add_child(btn_continuar)
 	
 	var btn_salvar = Button.new()
-	btn_salvar.text = "ðŸ’¾ Salvar Jogo"
+	btn_salvar.text = "💾 Salvar Jogo"
 	btn_salvar.add_theme_font_size_override("font_size", 16)
 	btn_salvar.pressed.connect(func():
-		label_feedback.text = "âœ… Jogo salvo com sucesso!" if Global.salvar_jogo() else "âŒ Erro ao salvar!"
+		label_feedback.text = "✅ Jogo salvo com sucesso!" if Global.salvar_jogo() else "❌ Erro ao salvar!"
 	)
 	vbox.add_child(btn_salvar)
 	
 	btn_carregar = Button.new()
-	btn_carregar.text = "ðŸ“‚ Carregar Jogo Salvo"
+	btn_carregar.text = "📂 Carregar Jogo Salvo"
 	btn_carregar.add_theme_font_size_override("font_size", 16)
 	btn_carregar.pressed.connect(func():
 		if Global.carregar_jogo():
-			label_feedback.text = "âœ… Save carregado!"
+			label_feedback.text = "✅ Save carregado!"
 			get_parent().alternar_pausa()
 	)
 	vbox.add_child(btn_carregar)
 	
 	var btn_menu = Button.new()
-	btn_menu.text = "ðŸ  Voltar ao Menu Principal"
+	btn_menu.text = "🏠 Voltar ao Menu Principal"
 	btn_menu.add_theme_font_size_override("font_size", 16)
 	btn_menu.pressed.connect(func():
 		get_tree().paused = false

@@ -76,7 +76,7 @@ func salvar_jogo() -> bool:
 	if arquivo:
 		arquivo.store_string(JSON.stringify(dados, "\t"))
 		arquivo.close()
-		print("ðŸ’¾ JOGO SALVO! Estruturas: ", dados["estruturas"].size(), " | Colonos: ", dados["colonos"].size())
+		print("💾 JOGO SALVO! Estruturas: ", dados["estruturas"].size(), " | Colonos: ", dados["colonos"].size())
 		return true
 	return false
 
@@ -208,5 +208,5 @@ func carregar_jogo() -> bool:
 							inst.grupo_frutas.visible = false
 							
 	Global.atualizar_navmesh_otimizado()
-	print("📂 JOGO CARREGADO COM SUCESSO!")
+	print("?? JOGO CARREGADO COM SUCESSO!")
 	return true

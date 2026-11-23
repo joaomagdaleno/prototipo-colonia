@@ -124,16 +124,16 @@ func obter_dica_mira() -> String:
 			var total = est.obter_total_itens_bau()
 			return btn_interagir + " Guardar/Pegar (" + str(total) + "/" + str(est.CAPACIDADE_MAXIMA_BAU) + " | " + est.obter_resumo_bau() + ")"
 		elif est.is_curtume:
-			if Global.carne_crua >= 2: return btn_usar + " Curtir Couro (2 Carne -> +1 Couro)"
-			elif Global.couro >= 1: return btn_usar + " Cortar Tiras (1 Couro -> +4 Gravetos)"
+			if Global.carne_crua >= 2: return btn_interagir + " Curtir Couro (2 Carne -> +1 Couro)"
+			elif Global.couro >= 1: return btn_interagir + " Cortar Tiras (1 Couro -> +4 Gravetos)"
 			return "Mesa de Curtume (Requer 2 Carne Crua ou 1 Couro)"
 		elif est.is_poco:
-			return btn_usar + " Beber Água do Poço (+45% Sede)"
+			return btn_interagir + " Beber Água do Poço (+45% Sede)"
 		elif est.is_canteiro:
 			if not est.canteiro_plantado:
-				return btn_usar + " Plantar Semente (1 Fruta)"
+				return btn_interagir + " Plantar Semente (1 Fruta)"
 			elif est.progresso_cultivo >= 100.0:
-				return btn_usar + " Colher Cultivo (+4 Frutas)"
+				return btn_interagir + " Colher Cultivo (+4 Frutas)"
 			return "🌱 Cultivando... " + str(int(est.progresso_cultivo)) + "%"
 		elif est.is_fogueira:
 			return btn_interagir + " Cozinhar (1 Carne -> 8 Comida | 2 Frutas -> 5)"

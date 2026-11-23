@@ -1,7 +1,7 @@
 extends StaticBody3D
 
 var cortada: bool = false
-var reservado: bool = false # Impede 2 colonos na mesma Ã¡rvore
+var reservado: bool = false # Impede 2 colonos na mesma árvore
 var marcado_para_coleta: bool = false
 var vida: int = 3 # Precisa de 3 machadadas do jogador para cair
 
@@ -27,15 +27,15 @@ func alternar_marcacao(ativar: bool):
 		if filho is MeshInstance3D:
 			filho.transparency = 0.35 if ativar else 0.0
 
-# FunÃ§Ã£o chamada pelo Jogador quando bate com o clique esquerdo
+# Função chamada pelo Jogador quando bate com o clique esquerdo
 func receber_dano(quantidade: int = 1):
 	if cortada:
 		return
 	
 	vida -= quantidade
-	print("Toc! Vida da Ã¡rvore: ", vida)
+	print("Toc! Vida da árvore: ", vida)
 	
-	# Efeito visual rÃ¡pido de impacto (tremida na Ã¡rvore)
+	# Efeito visual rápido de impacto (tremida na árvore)
 	var tween = create_tween()
 	tween.tween_property(self, "scale", Vector3(1.06, 0.94, 1.06), 0.05)
 	tween.tween_property(self, "scale", Vector3(1.0, 1.0, 1.0), 0.05)
@@ -43,12 +43,12 @@ func receber_dano(quantidade: int = 1):
 	if vida <= 0:
 		cortar()
 
-# FunÃ§Ã£o chamada quando a vida zera (ou diretamente pelo Colono)
+# Função chamada quando a vida zera (ou diretamente pelo Colono)
 func cortar():
 	if cortada:
 		return
 	cortada = true
-	print("Ãrvore cortada! +10 madeira")
+	print("Árvore cortada! +10 madeira")
 	Global.madeira += 10
 	
 	Global.atualizar_navmesh_otimizado()

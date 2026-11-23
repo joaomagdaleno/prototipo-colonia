@@ -44,7 +44,7 @@ func nascer_no_mundo(posicao_segura: Vector3 = Vector3(0, 1.2, 3)):
 		global_position = posicao_segura
 	velocity = Vector3.ZERO
 	set_physics_process(true)
-	print("ðŸ§ Jogador posicionado e pronto em: ", global_position)
+	print("🧍 Jogador posicionado e pronto em: ", global_position)
 
 func _input(event):
 	if get_tree().paused: return

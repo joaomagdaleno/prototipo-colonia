@@ -1,7 +1,7 @@
 extends Node
 
 ## Gerenciador e Avaliador de Tarefas do Colono
-## Prioriza sobrevivÃªncia, entrega fÃ­sica nos BaÃºs e coleta/construÃ§Ã£o marcadas.
+## Prioriza sobrevivência, entrega física nos Baús e coleta/construção marcadas.
 
 @onready var colono: CharacterBody3D = get_parent()
 
@@ -39,7 +39,7 @@ func limpar_alvos():
 func escolher_proxima_tarefa() -> Vector3:
 	_limpar_cache_ignorados()
 
-	# 1. Prioridade mÃ¡xima: SobrevivÃªncia (Sono / Noite)
+	# 1. Prioridade máxima: Sobrevivência (Sono / Noite)
 	if colono.energia <= 25.0 or Global.esta_de_noite():
 		var cama_livre = _procurar_cama_livre()
 		if cama_livre:
@@ -50,7 +50,7 @@ func escolher_proxima_tarefa() -> Vector3:
 			colono.dormindo = true
 			return Vector3.INF
 
-	# 2. Entrega LogÃ­stica: Se tem carga na mochila, leva para o BaÃº mais prÃ³ximo
+	# 2. Entrega Logística: Se tem carga na mochila, leva para o Baú mais próximo
 	if colono.obter_carga_mochila() > 0:
 		var bau_livre = _buscar_mais_proximo(Global.baus_ativos, func(b):
 			return b.construida and b.obter_total_itens_bau() < b.CAPACIDADE_MAXIMA_BAU
@@ -59,7 +59,7 @@ func escolher_proxima_tarefa() -> Vector3:
 			_definir_alvo(bau_livre, "bau")
 			return bau_livre.global_position
 		else:
-			# Fallback: se nÃ£o hÃ¡ baÃºs construÃ­dos ou todos estÃ£o cheios, entrega no estoque global
+			# Fallback: se não há baús construídos ou todos estão cheios, entrega no estoque global
 			_descarregar_mochila_no_global()
 
 		# 2.2 Prioridade por Profissao Especializada
@@ -88,28 +88,28 @@ func escolher_proxima_tarefa() -> Vector3:
 		arbusto.reservado = true
 		return arbusto.global_position
 
-	# 4. Itens soltos no chÃ£o marcados
+	# 4. Itens soltos no chão marcados
 	var item = _buscar_mais_proximo("recursos_marcados", func(c): return c.is_in_group("coletaveis_chao") and not c.reservado)
 	if item:
 		_definir_alvo(item, "coletavel")
 		item.reservado = true
 		return item.global_position
 
-	# 5. Projetos de ConstruÃ§Ã£o que podem ser pagos
+	# 5. Projetos de Construção que podem ser pagos
 	var projeto = _buscar_mais_proximo("projetos", func(p): return not p.construida and not p.reservado and p.pode_pagar())
 	if projeto:
 		_definir_alvo(projeto, "projeto")
 		projeto.reservado = true
 		return projeto.global_position
 
-	# 6. Madeira (Ãrvores Marcadas)
+	# 6. Madeira (Árvores Marcadas)
 	var arvore = _buscar_mais_proximo("recursos_marcados", func(a): return a.is_in_group("arvores") and not a.cortada and not a.reservado)
 	if arvore:
 		_definir_alvo(arvore, "arvore")
 		arvore.reservado = true
 		return arvore.global_position
 
-	# 7. MineraÃ§Ã£o (Pedras Grandes Marcadas)
+	# 7. Mineração (Pedras Grandes Marcadas)
 	var pedra = _buscar_mais_proximo("recursos_marcados", func(r): return r.is_in_group("pedras") and not r.quebrada and not r.reservado)
 	if pedra:
 		_definir_alvo(pedra, "pedra")
@@ -186,8 +186,8 @@ func _depositar_no_bau(bau: Node3D):
 			depositou = true
 		colono.mochila[chave] = qtd
 	if depositou:
-		print("ðŸ“¦ Colono depositou recursos no BaÃº! Estoque do BaÃº: ", bau.obter_total_itens_bau(), "/", bau.CAPACIDADE_MAXIMA_BAU)
-	# Se sobrou algo porque o baÃº encheu no meio da entrega, o prÃ³ximo ciclo procura outro baÃº ou descarrega no Global
+		print("📦 Colono depositou recursos no Baú! Estoque do Baú: ", bau.obter_total_itens_bau(), "/", bau.CAPACIDADE_MAXIMA_BAU)
+	# Se sobrou algo porque o baú encheu no meio da entrega, o próximo ciclo procura outro baú ou descarrega no Global
 
 func _descarregar_mochila_no_global():
 	for chave in colono.mochila.keys():

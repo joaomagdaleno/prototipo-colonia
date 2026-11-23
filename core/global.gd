@@ -20,7 +20,7 @@ var canteiros_ativos: Array[Node3D] = []
 var pocos_ativos: Array[Node3D] = []
 var estoque_total_baus: Dictionary = {"madeira": 0, "pedra": 0, "gravetos": 0, "pedrinhas": 0, "comida": 0, "frutas": 0}
 
-# SobrevivÃªncia do Jogador
+# Sobrevivência do Jogador
 var vida_jogador: int = 100
 const VIDA_MAX_JOGADOR: int = 100
 var saciedade_jogador: float = 85.0
@@ -90,7 +90,7 @@ func _process(delta):
 	if hora_do_dia >= 24.0:
 		hora_do_dia = 0.0
 
-	# 2. VariaÃ§Ã£o ClimÃ¡tica
+	# 2. Variação Climática
 	_tempo_proximo_clima -= delta
 	if _tempo_proximo_clima <= 0:
 		_tempo_proximo_clima = randf_range(40.0, 75.0)
@@ -101,9 +101,9 @@ func _process(delta):
 			clima_atual = Clima.NUBLADO
 		else:
 			clima_atual = Clima.CHUVA
-		print("ðŸŒ¦ï¸ Clima mudou para: ", obter_texto_clima())
+		print("🌦️ Clima mudou para: ", obter_texto_clima())
 
-	# 3. Metabolismo e RegeneraÃ§Ã£o (executa 1 vez por segundo)
+	# 3. Metabolismo e Regeneração (executa 1 vez por segundo)
 	tempo_sem_combate += delta
 	_timer_metabolismo += delta
 	if _timer_metabolismo >= 1.0:
@@ -127,11 +127,11 @@ func esta_chovendo() -> bool:
 
 func obter_texto_clima() -> String:
 	match clima_atual:
-		Clima.ENSOLARADO: return "â˜€ï¸ Sol"
-		Clima.NUBLADO: return "â›… Nublado"
-		Clima.TEMPESTADE: return "⛈ Tempestade"
-		Clima.CHUVA: return "ðŸŒ§ï¸ Chuva"
-	return "â˜€ï¸ Sol"
+		Clima.ENSOLARADO: return "☀️ Sol"
+		Clima.NUBLADO: return "⛅ Nublado"
+		Clima.TEMPESTADE: return "? Tempestade"
+		Clima.CHUVA: return "🌧️ Chuva"
+	return "☀️ Sol"
 
 func obter_hora_formatada() -> String:
 	var horas = int(hora_do_dia)
@@ -182,7 +182,7 @@ func craftar_machado_pedra() -> bool:
 	gravetos -= 3
 	pedrinhas -= 2
 	tem_machado_pedra = true
-	print("ðŸª“ Machado de Pedra fabricado!")
+	print("🪓 Machado de Pedra fabricado!")
 	return true
 
 func craftar_mochila_couro() -> bool:
@@ -191,7 +191,7 @@ func craftar_mochila_couro() -> bool:
 	couro -= 4
 	gravetos -= 3
 	tem_mochila_couro = true
-	print("ðŸŽ’ Mochila de Couro fabricada!")
+	print("🎒 Mochila de Couro fabricada!")
 	return true
 
 func contratar_colono() -> bool:
@@ -244,9 +244,9 @@ func aplicar_dano_jogador(qtd: int):
 	var hud = get_tree().current_scene.get_node_or_null("HUD") if get_tree().current_scene else null
 	if is_instance_valid(hud) and hud.has_method("mostrar_flash_dano"):
 		hud.mostrar_flash_dano()
-	print("ðŸ©¸ Sofreu ", qtd, " de dano! Vida: ", vida_jogador, "/", VIDA_MAX_JOGADOR)
+	print("🩸 Sofreu ", qtd, " de dano! Vida: ", vida_jogador, "/", VIDA_MAX_JOGADOR)
 	if vida_jogador <= 0:
-		print("ðŸ’« Desmaiou! Retornando Ã  Bancada...")
+		print("💫 Desmaiou! Retornando à Bancada...")
 		vida_jogador = 50
 		saciedade_jogador = 50.0
 		hidratacao_jogador = 50.0
@@ -266,13 +266,13 @@ func comer_jogador(usar_comida_pronta: bool) -> bool:
 	if usar_comida_pronta and comida >= 1:
 		comida -= 1
 		saciedade_jogador = min(100.0, saciedade_jogador + 35.0)
-		print("ðŸ² RefeiÃ§Ã£o consumida! Saciedade: ", int(saciedade_jogador), "%")
+		print("🍲 Refeição consumida! Saciedade: ", int(saciedade_jogador), "%")
 		return true
 	elif not usar_comida_pronta and frutas >= 1:
 		frutas -= 1
 		saciedade_jogador = min(100.0, saciedade_jogador + 12.0)
 		hidratacao_jogador = min(100.0, hidratacao_jogador + 10.0)
-		print("ðŸ« Frutas consumidas! Saciedade: ", int(saciedade_jogador), "% | HidrataÃ§Ã£o: ", int(hidratacao_jogador), "%")
+		print("🫐 Frutas consumidas! Saciedade: ", int(saciedade_jogador), "% | Hidratação: ", int(hidratacao_jogador), "%")
 		return true
 	return false
 
@@ -280,7 +280,7 @@ func beber_agua_jogador() -> bool:
 	if hidratacao_jogador >= 98.0:
 		return false
 	hidratacao_jogador = min(100.0, hidratacao_jogador + 45.0)
-	print("ðŸ’§ Ãgua consumida! HidrataÃ§Ã£o: ", int(hidratacao_jogador), "%")
+	print("💧 Água consumida! Hidratação: ", int(hidratacao_jogador), "%")
 	return true
 
 func melhorar_machado() -> bool:
