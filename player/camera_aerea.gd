@@ -27,7 +27,7 @@ func _ready():
 	add_to_group("camera_aerea")
 	_forma_demolir = SphereShape3D.new()
 	_forma_demolir.radius = 0.45
-	far = 350.0
+	far = 220.0
 
 	oceano_visual = GradeOceanoVisual.criar_oceano()
 	get_tree().current_scene.call_deferred("add_child", oceano_visual)

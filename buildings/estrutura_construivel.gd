@@ -141,7 +141,7 @@ func construir() -> bool:
 	remove_from_group("projetos")
 	add_to_group("construidos")
 	coordenada_grade = Vector2i(int(round(global_position.x)), int(round(global_position.z)))
-		Global.estradas_pos[coordenada_grade] = self
+	Global.estradas_pos[coordenada_grade] = self
 	
 	if luz:
 		luz.visible = true
