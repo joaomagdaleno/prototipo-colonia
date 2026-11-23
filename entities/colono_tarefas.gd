@@ -50,7 +50,7 @@ func escolher_proxima_tarefa() -> Vector3:
 
 	# 2. Entrega LogÃ­stica: Se tem carga na mochila, leva para o BaÃº mais prÃ³ximo
 	if colono.obter_carga_mochila() > 0:
-		var bau_livre = _buscar_mais_proximo("baus", func(b):
+		var bau_livre = _buscar_mais_proximo(Global.baus_ativos, func(b):
 			return b.construida and b.obter_total_itens_bau() < b.CAPACIDADE_MAXIMA_BAU
 		)
 		if bau_livre:
@@ -186,12 +186,13 @@ func _limpar_cache_ignorados():
 	for item_exp in expirados:
 		alvos_ignorados.erase(item_exp)
 
-func _buscar_mais_proximo(grupo: String, filtro: Callable) -> Node3D:
+func _buscar_mais_proximo(fonte, filtro: Callable) -> Node3D:
 	var mais_perto: Node3D = null
 	var menor_dist_sq := INF
 	var pos_colono := colono.global_position
 
-	for item in get_tree().get_nodes_in_group(grupo):
+	var lista = fonte if fonte is Array else get_tree().get_nodes_in_group(fonte)
+	for item in lista:
 		if not is_instance_valid(item) or item in alvos_ignorados or not filtro.call(item):
 			continue
 		var dist_sq = pos_colono.distance_squared_to(item.global_position)

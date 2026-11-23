@@ -16,6 +16,9 @@ var label_lista_colonos: Label
 var botao_contratar: Button
 var painel_objetivos: PanelContainer
 var label_objetivos: Label
+var _timer_objetivos: float = 0.0
+var _objetivos_concluidos: bool = false
+var _timer_lista_colonos: float = 0.0
 
 @onready var inventario_ui = $InventarioUI
 @onready var construcao_menu_ui = $ConstrucaoMenuUI
@@ -171,7 +174,7 @@ func _unhandled_input(event):
 			alternar_pausa()
 		get_viewport().set_input_as_handled()
 
-func _process(_delta):
+func _process(delta):
 	var _novo_topo = (
 		"â¤ï¸ " + str(Global.vida_jogador) +
 		"  |  ðŸ– " + str(int(Global.saciedade_jogador)) + "%" +
@@ -204,7 +207,7 @@ func _process(_delta):
 
 	botao_contratar.visible = jogador.no_modo_construcao
 	painel_colonos.visible = jogador.no_modo_construcao
-	_atualizar_objetivos_iniciais(jogador.no_modo_construcao)
+	_atualizar_objetivos_iniciais(delta, jogador.no_modo_construcao)
 	painel_baixo.visible = not jogador.no_modo_construcao
 	if is_instance_valid(dock_ui):
 		dock_ui.definir_visivel(jogador.no_modo_construcao)
@@ -273,11 +276,14 @@ if not is_instance_valid(flash_dano): return
 flash_dano.color.a = 0.35
 var tween = create_tween()
 tween.tween_property(flash_dano, "color:a", 0.0, 0.35)
-func _atualizar_objetivos_iniciais(em_planejador: bool):
-	if not is_instance_valid(painel_objetivos): return
+func _atualizar_objetivos_iniciais(delta: float, em_planejador: bool):
+	if _objetivos_concluidos or not is_instance_valid(painel_objetivos): return
 	if em_planejador:
 		painel_objetivos.visible = false
 		return
+	_timer_objetivos -= delta
+	if _timer_objetivos > 0.0: return
+	_timer_objetivos = 1.0
 	var tem_fogueira = false
 	for est in get_tree().get_nodes_in_group("construidos"):
 		if is_instance_valid(est) and "is_fogueira" in est and est.is_fogueira:
@@ -286,7 +292,8 @@ func _atualizar_objetivos_iniciais(em_planejador: bool):
 	var tem_colono = get_tree().get_nodes_in_group("colonos").size() > 0
 	var ok1 = Global.tem_machado_pedra
 	if ok1 and tem_fogueira and tem_cama and tem_colono:
-		painel_objetivos.visible = false
+		_objetivos_concluidos = true
+		painel_objetivos.queue_free()
 		return
 	painel_objetivos.visible = true
 	label_objetivos.text = (

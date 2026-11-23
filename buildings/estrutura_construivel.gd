@@ -138,7 +138,7 @@ func construir() -> bool:
 	
 	remove_from_group("projetos")
 	add_to_group("construidos")
-		Global.estradas_pos[Vector2i(int(round(global_position.x)), int(round(global_position.z)))] = self
+	Global.estradas_pos[Vector2i(int(round(global_position.x)), int(round(global_position.z)))] = self
 	
 	if luz:
 		luz.visible = true

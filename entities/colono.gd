@@ -38,8 +38,8 @@ func _ready():
 	add_to_group("colonos")
 	agent.path_desired_distance = 0.5
 	agent.target_desired_distance = 0.5
-	posicao_anterior = global_position
 	_otimizar_renderizacao_vega8()
+	posicao_anterior = global_position
 
 func _physics_process(delta):
 	velocity.y = 0.0 if is_on_floor() else velocity.y - GRAVIDADE * delta
@@ -141,7 +141,6 @@ func _physics_process(delta):
 	else:
 		tempo_preso = 0.0
 	posicao_anterior = global_position
-	_otimizar_renderizacao_vega8()
 
 func _tentar_alimentar_colono():
 	if Global.comida > 0:
