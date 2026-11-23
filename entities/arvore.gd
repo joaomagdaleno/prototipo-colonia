@@ -36,9 +36,12 @@ func receber_dano(quantidade: int = 1):
 	print("Toc! Vida da árvore: ", vida)
 	
 	# Efeito visual rápido de impacto (tremida na árvore)
-	var tween = create_tween()
-	tween.tween_property(self, "scale", Vector3(1.06, 0.94, 1.06), 0.05)
-	tween.tween_property(self, "scale", Vector3(1.0, 1.0, 1.0), 0.05)
+	var malhas = get_children().filter(func(n): return n is MeshInstance3D)
+	if not malhas.is_empty():
+		var tween = create_tween()
+		for f in malhas:
+		tween.parallel().tween_property(f, "scale", Vector3(1.06, 0.94, 1.06), 0.05)
+			tween.tween_property(f, "scale", Vector3(1.0, 1.0, 1.0), 0.05)
 	
 	if vida <= 0:
 		cortar()

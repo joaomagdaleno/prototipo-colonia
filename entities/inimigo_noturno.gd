@@ -176,9 +176,12 @@ func _buscar_muro_a_frente() -> EstruturaConstruivel:
 	return null
 
 func receber_dano(dano: int):
-	var tween = create_tween()
-	tween.tween_property(self, "scale", Vector3(1.18, 0.82, 1.18), 0.06)
-	tween.tween_property(self, "scale", Vector3(1.0, 1.0, 1.0), 0.08)
+	var malhas = get_children().filter(func(n): return n is MeshInstance3D)
+	if not malhas.is_empty():
+		var tween = create_tween()
+		for f in malhas:
+		tween.parallel().tween_property(f, "scale", Vector3(1.18, 0.82, 1.18), 0.06)
+			tween.tween_property(f, "scale", Vector3(1.0, 1.0, 1.0), 0.08)
 	print("Golpe na criatura! Vida restante: ", max(0, vida - dano))
 	vida -= dano
 	if is_instance_valid(jogador):
