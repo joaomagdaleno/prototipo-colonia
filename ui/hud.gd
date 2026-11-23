@@ -75,7 +75,7 @@ func _montar_hud_base():
 	label_modo.modulate = Color(1.0, 0.85, 0.3)
 	hbox_topo.add_child(label_modo)
 
-	# 2. PAINEL DE COLONOS (VisÃ­vel apenas no Planejador AÃ©reo)
+	# 2. PAINEL DE COLONOS (Visível apenas no Planejador Aéreo)
 	painel_colonos = PanelContainer.new()
 	painel_colonos.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 	painel_colonos.offset_left = -280; painel_colonos.offset_top = 20
@@ -211,17 +211,17 @@ func _unhandled_input(event):
 
 func _process(delta):
 	var _novo_topo = (
-		"â¤ï¸ " + str(Global.vida_jogador) +
-		"  |  ðŸ– " + str(int(Global.saciedade_jogador)) + "%" +
-		"  |  ðŸ’§ " + str(int(Global.hidratacao_jogador)) + "%" +
-		"  |  ðŸªµ " + str(Global.madeira) +
-		"  |  ðŸª¨ " + str(Global.pedra) +
-		"  |  âšª " + str(Global.pedrinhas) +
-		"  |  ðŸŒ¿ " + str(Global.gravetos) +
-		"  |  ðŸ« " + str(Global.frutas) +
-		"  |  ðŸ¥© " + str(Global.carne_crua) +
-		"  |  ðŸ² " + str(Global.comida) +
-		"  |  ðŸ•’ " + "Dia " + str(Global.dia_atual) + " - " + Global.obter_hora_formatada() +
+		"❤️ " + str(Global.vida_jogador) +
+		"  |  🍖 " + str(int(Global.saciedade_jogador)) + "%" +
+		"  |  💧 " + str(int(Global.hidratacao_jogador)) + "%" +
+		"  |  🪵 " + str(Global.madeira) +
+		"  |  🪨 " + str(Global.pedra) +
+		"  |  ⚪ " + str(Global.pedrinhas) +
+		"  |  🌿 " + str(Global.gravetos) +
+		"  |  🫐 " + str(Global.frutas) +
+		"  |  🥩 " + str(Global.carne_crua) +
+		"  |  🍲 " + str(Global.comida) +
+		"  |  🕒 " + "Dia " + str(Global.dia_atual) + " - " + Global.obter_hora_formatada() +
 		"  |  " + Global.obter_texto_clima() + ("  |  🐺 HORDA NOTURNA!" if Global.is_noite_de_horda() else "")
 	)
 	if _novo_topo != _ultimo_texto_topo:
@@ -304,11 +304,11 @@ func _process(delta):
 	elif jogador.construindo_1p:
 		label_dica_mira.text = ""; label_modo.text = "|  CONSTRUINDO"
 		var nome_mob = _obter_nome_mobilia_1p()
-		label_atalhos.text = ("PeÃ§a: " + nome_mob + " | [L1/R1] Girar | [B] Guia | [R2] Colocar | [L2] Guardar") if joy else ("PeÃ§a: " + nome_mob + " | [Q/R] Girar | [B] Guia | [Esq] Colocar | [Dir] Guardar")
+		label_atalhos.text = ("Peça: " + nome_mob + " | [L1/R1] Girar | [B] Guia | [R2] Colocar | [L2] Guardar") if joy else ("Peça: " + nome_mob + " | [Q/R] Girar | [B] Guia | [Esq] Colocar | [Dir] Guardar")
 		mira.visible = true
 	else:
 		label_modo.text = "|  1Âª PESSOA"
-		label_atalhos.text = "[R2] Cortar/CaÃ§ar | [X] Interagir | [D-Pad â–¼] Guia [B] | [D-Pad â–²] InventÃ¡rio | [Start] Pausa" if joy else "[Esq] Cortar/CaÃ§ar | [E] Interagir | [B] Guia de ConstruÃ§Ã£o | [I] InventÃ¡rio | [ESC] Pausa"
+		label_atalhos.text = "[R2] Cortar/Caçar | [X] Interagir | [D-Pad ▼] Guia [B] | [D-Pad ▲] Inventário | [Start] Pausa" if joy else "[Esq] Cortar/Caçar | [E] Interagir | [B] Guia de Construção | [I] Inventário | [ESC] Pausa"
 		mira.visible = true
 		_timer_mira -= delta
 	if _timer_mira <= 0.0:
@@ -324,7 +324,7 @@ func _formatar_custo(est: EstruturaConstruivel) -> String:
 	if est.custo_pedra > 0: partes.append(str(est.custo_pedra) + " ped")
 	if est.custo_gravetos > 0: partes.append(str(est.custo_gravetos) + " grav")
 	if est.custo_pedrinhas > 0: partes.append(str(est.custo_pedrinhas) + " pedr")
-	return "GrÃ¡tis" if partes.is_empty() else ", ".join(partes)
+	return "Grátis" if partes.is_empty() else ", ".join(partes)
 
 func _obter_nome_peca_aerea() -> String:
 	if is_instance_valid(camera_aerea) and is_instance_valid(camera_aerea.fantasma):

@@ -26,7 +26,7 @@ var _timer_cultivo: float = 1.0
 @export var is_portao: bool = false
 @export var vida_maxima: int = 100
 
-# Armazenamento FÃ­sico (BaÃº)
+# Armazenamento Físico (Baú)
 var estoque_bau: Dictionary = {
 	"madeira": 0,
 	"pedra": 0,
@@ -394,10 +394,10 @@ func transferir_tudo_do_jogador():
 				depositou = true
 				
 	if depositou:
-		print("ðŸ“¦ Recursos guardados no BaÃº! (", obter_total_itens_bau(), "/", CAPACIDADE_MAXIMA_BAU, ")")
+		print("📦 Recursos guardados no Baú! (", obter_total_itens_bau(), "/", CAPACIDADE_MAXIMA_BAU, ")")
 		return
 		
-	# Se nÃ£o tinha nada para guardar, retira atÃ© 10 unidades de cada recurso guardado para o jogador
+	# Se não tinha nada para guardar, retira até 10 unidades de cada recurso guardado para o jogador
 	var retirou = false
 	for tipo in ["madeira", "pedra", "gravetos", "pedrinhas", "comida", "frutas"]:
 		var tirado = retirar_item_do_bau(tipo, 10)
@@ -405,7 +405,7 @@ func transferir_tudo_do_jogador():
 			Global.set(tipo, int(Global.get(tipo)) + tirado)
 			retirou = true
 	if retirou:
-		print("ðŸŽ’ Recursos retirados do BaÃº para o inventÃ¡rio!")
+		print("🎒 Recursos retirados do Baú para o inventário!")
 
 func obter_resumo_bau() -> String:
 	var partes = []

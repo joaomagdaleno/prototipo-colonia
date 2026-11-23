@@ -1,8 +1,8 @@
 extends Control
 
-## Menu de ConstruÃ§Ã£o em 1Âª Pessoa
-## Apresenta os projetos organizados por abas temÃ¡ticas, com cards descritivos,
-## custos em tempo real e seleÃ§Ã£o direta para o fantasma 1P.
+## Menu de Construção em 1ª Pessoa
+## Apresenta os projetos organizados por abas temáticas, com cards descritivos,
+## custos em tempo real e seleção direta para o fantasma 1P.
 
 var painel: PanelContainer
 var container_abas: HBoxContainer
@@ -13,32 +13,32 @@ var label_titulo_aba: Label
 var catalogo := [
 	{
 		"categoria": "Estruturas",
-		"icone": "ðŸªµ",
+		"icone": "🪵",
 		"itens": [
-			{"nome": "Piso de Madeira", "cena_path": "res://buildings/Piso.tscn", "icone": "ðŸŸ«", "desc": "FundaÃ§Ã£o plana para suportar construÃ§Ãµes."},
-			{"nome": "Parede de Madeira", "cena_path": "res://buildings/ParedeMadeira.tscn", "icone": "ðŸ§±", "desc": "Parede modular com snap em pisos e paredes."},
-			{"nome": "Teto de Madeira", "cena_path": "res://buildings/TetoMadeira.tscn", "icone": "â›º", "desc": "Telhado protetor contra chuvas intensas."},
+			{"nome": "Piso de Madeira", "cena_path": "res://buildings/Piso.tscn", "icone": "🟫", "desc": "Fundação plana para suportar construções."},
+			{"nome": "Parede de Madeira", "cena_path": "res://buildings/ParedeMadeira.tscn", "icone": "🧱", "desc": "Parede modular com snap em pisos e paredes."},
+			{"nome": "Teto de Madeira", "cena_path": "res://buildings/TetoMadeira.tscn", "icone": "⛺", "desc": "Telhado protetor contra chuvas intensas."},
 		]
 	},
 	{
-		"categoria": "SobrevivÃªncia",
-		"icone": "ðŸ”¥",
+		"categoria": "Sobrevivência",
+		"icone": "🔥",
 		"itens": [
-			{"nome": "Fogueira", "cena_path": "res://buildings/Fogueira.tscn", "icone": "ðŸ”¥", "desc": "Aquece, ilumina Ã  noite e cozinha alimentos."},
+			{"nome": "Fogueira", "cena_path": "res://buildings/Fogueira.tscn", "icone": "🔥", "desc": "Aquece, ilumina à noite e cozinha alimentos."},
 			{"nome": "Canteiro de Cultivo", "cena_path": "res://buildings/Canteiro.tscn", "icone": "🌱", "desc": "Plante 1 Fruta para colher +4 Frutas. Cresce 2x mais rápido na chuva."},
 			{"nome": "Poço de Água", "cena_path": "res://buildings/PocoAgua.tscn", "icone": "🚰", "desc": "Fonte de água limpa na base (+50% Sede ao interagir com [E])."},
 			{"nome": "Mesa de Curtume", "cena_path": "res://buildings/Curtume.tscn", "icone": "🧵", "desc": "Curte 2 Carnes Cruas -> +1 Couro ou corta 1 Couro -> +4 Gravetos com [E]."},
-			{"nome": "BaÃº de Estoque", "cena_path": "res://buildings/Bau.tscn", "icone": "ðŸ“¦", "desc": "Armazena atÃ© 150 recursos com descarga rÃ¡pida."},
-			{"nome": "Cama de Madeira", "cena_path": "res://buildings/Cama.tscn", "icone": "ðŸ›ï¸", "desc": "Permite dormir durante a noite atÃ© amanhecer."},
-			{"nome": "Bancada Central", "cena_path": "res://buildings/Bancada.tscn", "icone": "ðŸ› ï¸", "desc": "Mesa de trabalho e acesso ao Planejador AÃ©reo."},
+			{"nome": "Baú de Estoque", "cena_path": "res://buildings/Bau.tscn", "icone": "📦", "desc": "Armazena até 150 recursos com descarga rápida."},
+			{"nome": "Cama de Madeira", "cena_path": "res://buildings/Cama.tscn", "icone": "🛏️", "desc": "Permite dormir durante a noite até amanhecer."},
+			{"nome": "Bancada Central", "cena_path": "res://buildings/Bancada.tscn", "icone": "🛠️", "desc": "Mesa de trabalho e acesso ao Planejador Aéreo."},
 		]
 	},
 	{
 		"categoria": "Defesa & Cerco",
-		"icone": "ðŸ›¡ï¸",
+		"icone": "🛡️",
 		"itens": [
-			{"nome": "Muro de Pedra", "cena_path": "res://buildings/MuroPedra.tscn", "icone": "ðŸª¨", "desc": "Barreira robusta contra criaturas noturnas."},
-			{"nome": "PortÃ£o de Madeira", "cena_path": "res://buildings/Portao.tscn", "icone": "ðŸšª", "desc": "Abre e fecha com [E] permitindo passagem livre."},
+			{"nome": "Muro de Pedra", "cena_path": "res://buildings/MuroPedra.tscn", "icone": "🪨", "desc": "Barreira robusta contra criaturas noturnas."},
+			{"nome": "Portão de Madeira", "cena_path": "res://buildings/Portao.tscn", "icone": "🚪", "desc": "Abre e fecha com [E] permitindo passagem livre."},
 		]
 	}
 ]
@@ -93,7 +93,7 @@ func _montar_interface():
 	vbox.add_child(header)
 
 	var titulo = Label.new()
-	titulo.text = "ðŸ“– GUIA DE CONSTRUÃ‡ÃƒO DO SOBREVIVENTE"
+	titulo.text = "📖 GUIA DE CONSTRUÇÃO DO SOBREVIVENTE"
 	titulo.add_theme_font_size_override("font_size", 20)
 	header.add_child(titulo)
 
@@ -143,7 +143,7 @@ func _montar_interface():
 
 	label_custos = Label.new()
 	label_custos.add_theme_font_size_override("font_size", 14)
-	label_custos.text = "Selecione uma peÃ§a para posicionar o fantasma no mundo."
+	label_custos.text = "Selecione uma peça para posicionar o fantasma no mundo."
 	rodape.add_child(label_custos)
 
 func _trocar_aba(indice: int):
@@ -209,11 +209,11 @@ func _renderizar_cards():
 
 		var card_custo = Label.new()
 		var custos_arr = []
-		if custos["mad"] > 0: custos_arr.append(str(custos["mad"]) + "ðŸªµ")
-		if custos["ped"] > 0: custos_arr.append(str(custos["ped"]) + "ðŸª¨")
-		if custos["grav"] > 0: custos_arr.append(str(custos["grav"]) + "ðŸŒ¿")
-		if custos["pedr"] > 0: custos_arr.append(str(custos["pedr"]) + "âšª")
-		var txt_custo = " ".join(custos_arr) if not custos_arr.is_empty() else "GrÃ¡tis"
+		if custos["mad"] > 0: custos_arr.append(str(custos["mad"]) + "🪵")
+		if custos["ped"] > 0: custos_arr.append(str(custos["ped"]) + "🪨")
+		if custos["grav"] > 0: custos_arr.append(str(custos["grav"]) + "🌿")
+		if custos["pedr"] > 0: custos_arr.append(str(custos["pedr"]) + "⚪")
+		var txt_custo = " ".join(custos_arr) if not custos_arr.is_empty() else "Grátis"
 		
 		card_custo.text = "Custo: " + txt_custo
 		card_custo.add_theme_font_size_override("font_size", 12)

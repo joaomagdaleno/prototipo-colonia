@@ -1,7 +1,7 @@
 extends Control
 
-## Barra Inferior Dock de ConstruÃ§Ã£o
-## Organiza as ferramentas e peÃ§as do modo Planejador AÃ©reo em abas limpas e compactas.
+## Barra Inferior Dock de Construção
+## Organiza as ferramentas e peças do modo Planejador Aéreo em abas limpas e compactas.
 
 var dock_container: PanelContainer
 var hbox_categorias: HBoxContainer
@@ -14,35 +14,35 @@ var camera_aerea: Camera3D
 var categorias := [
 	{
 		"nome": "Caminhos & Pisos",
-		"icone": "ðŸ›¤ï¸",
+		"icone": "🛤️",
 		"itens": [
-			{"nome": "Estrada", "path": "res://buildings/Estrada.tscn", "icone": "ðŸŸ«"},
-			{"nome": "Bloco", "path": "res://buildings/Bloco.tscn", "icone": "ðŸŸ©"},
-			{"nome": "Piso Madeira", "path": "res://buildings/Piso.tscn", "icone": "ðŸªµ"}
+			{"nome": "Estrada", "path": "res://buildings/Estrada.tscn", "icone": "🟫"},
+			{"nome": "Bloco", "path": "res://buildings/Bloco.tscn", "icone": "🟩"},
+			{"nome": "Piso Madeira", "path": "res://buildings/Piso.tscn", "icone": "🪵"}
 		]
 	},
 	{
 		"nome": "Estruturas",
-		"icone": "ðŸ ",
+		"icone": "🏠",
 		"itens": [
-			{"nome": "Parede", "path": "res://buildings/ParedeMadeira.tscn", "icone": "ðŸ§±"},
-			{"nome": "Teto", "path": "res://buildings/TetoMadeira.tscn", "icone": "â›º"}
+			{"nome": "Parede", "path": "res://buildings/ParedeMadeira.tscn", "icone": "🧱"},
+			{"nome": "Teto", "path": "res://buildings/TetoMadeira.tscn", "icone": "⛺"}
 		]
 	},
 	{
 		"nome": "Defesa",
-		"icone": "ðŸ›¡ï¸",
+		"icone": "🛡️",
 		"itens": [
-			{"nome": "Muro Pedra", "path": "res://buildings/MuroPedra.tscn", "icone": "ðŸª¨"},
-			{"nome": "PortÃ£o", "path": "res://buildings/Portao.tscn", "icone": "ðŸšª"}
+			{"nome": "Muro Pedra", "path": "res://buildings/MuroPedra.tscn", "icone": "🪨"},
+			{"nome": "Portão", "path": "res://buildings/Portao.tscn", "icone": "🚪"}
 		]
 	},
 	{
 		"nome": "Armazenamento & Trabalho",
-		"icone": "ðŸ“¦",
+		"icone": "📦",
 		"itens": [
-			{"nome": "BaÃº", "path": "res://buildings/Bau.tscn", "icone": "ðŸ“¦"},
-			{"nome": "Fogueira", "path": "res://buildings/Fogueira.tscn", "icone": "ðŸ”¥"},
+			{"nome": "Baú", "path": "res://buildings/Bau.tscn", "icone": "📦"},
+			{"nome": "Fogueira", "path": "res://buildings/Fogueira.tscn", "icone": "🔥"},
 			{"nome": "Cama", "path": "res://buildings/Cama.tscn", "icone": "🛏"},
 			{"nome": "Canteiro", "path": "res://buildings/Canteiro.tscn", "icone": "🌱"},
 			{"nome": "Poço Água", "path": "res://buildings/PocoAgua.tscn", "icone": "🚰"},
@@ -90,7 +90,7 @@ func _montar_dock():
 	hbox_itens.add_theme_constant_override("separation", 10)
 	margem_sub.add_child(hbox_itens)
 
-	# 2. Barra Dock Principal no RodapÃ©
+	# 2. Barra Dock Principal no Rodapé
 	dock_container = PanelContainer.new()
 	dock_container.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	dock_container.offset_bottom = -15
@@ -122,9 +122,9 @@ func _montar_dock():
 		hbox_categorias.add_child(btn)
 		botoes_cat.append(btn)
 
-	# BotÃ£o Pincel de DemoliÃ§Ã£o / Corte
+	# Botão Pincel de Demolição / Corte
 	var btn_pincel = Button.new()
-	btn_pincel.text = "ðŸª“ Pincel de Corte [C]"
+	btn_pincel.text = "🪓 Pincel de Corte [C]"
 	btn_pincel.add_theme_font_size_override("font_size", 14)
 	btn_pincel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	btn_pincel.pressed.connect(func():

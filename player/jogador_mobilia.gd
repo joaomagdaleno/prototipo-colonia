@@ -10,7 +10,7 @@ var fantasma_1p: Node3D = null
 
 func alternar_modo():
 	if opcoes_mobilia.is_empty():
-		print("AVISO: Adicione as cenas em 'Opcoes Mobilia' no Inspetor do nÃ³ Mobilia!")
+		print("AVISO: Adicione as cenas em 'Opcoes Mobilia' no Inspetor do nó Mobilia!")
 		return
 		
 	jogador.construindo_1p = not jogador.construindo_1p

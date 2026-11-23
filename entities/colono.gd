@@ -105,7 +105,7 @@ func _physics_process(delta):
 			tempo_espera = 0.8
 		return
 
-	# 4. Escolher PrÃ³xima Tarefa
+	# 4. Escolher Próxima Tarefa
 	if not tarefas.tem_alvo():
 		var destino = tarefas.escolher_proxima_tarefa()
 		if destino != Vector3.INF:
@@ -116,7 +116,7 @@ func _physics_process(delta):
 			velocity.x = 0; velocity.z = 0; move_and_slide()
 		return
 
-	# 5. Navegar atÃ© o Alvo
+	# 5. Navegar até o Alvo
 	var alvo = tarefas.obter_alvo_atual()
 	if not is_instance_valid(alvo):
 		tarefas.limpar_alvos()
