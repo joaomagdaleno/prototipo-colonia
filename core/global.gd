@@ -36,6 +36,8 @@ var tier_lanca: int = 0
 var equipe_ferramentas: bool = false
 var equipe_mochilas: bool = false
 var tem_mochila_couro: bool = false
+var tem_balde: bool = false
+var balde_cheio: bool = false
 var usando_joystick: bool = false
 
 # Tempo e Clima
@@ -190,19 +192,19 @@ const CAPACIDADE_PESO_BASE := 15.0
 const BONUS_PESO_MOCHILA := 15.0
 
 func obter_peso_atual() -> float:
-return (
-pedra * 2.5 +
-madeira * 1.5 +
-carne_crua * 1.0 +
-(comida + couro) * 0.8 +
-(gravetos + pedrinhas + frutas) * 0.5
-)
+	return (
+		pedra * 2.5 +
+		madeira * 1.5 +
+		carne_crua * 1.0 +
+		(comida + couro) * 0.8 +
+		(gravetos + pedrinhas + frutas) * 0.5
+	)
 
 func obter_capacidade_peso() -> float:
-return CAPACIDADE_PESO_BASE + (BONUS_PESO_MOCHILA if tem_mochila_couro else 0.0)
+	return CAPACIDADE_PESO_BASE + (BONUS_PESO_MOCHILA if tem_mochila_couro else 0.0)
 
 func esta_sobrecarregado() -> bool:
-return obter_peso_atual() > obter_capacidade_peso()
+	return obter_peso_atual() > obter_capacidade_peso()
 
 func craftar_mochila_couro() -> bool:
 	if tem_mochila_couro or couro < 4 or gravetos < 3:
@@ -252,6 +254,8 @@ func iniciar_novo_jogo():
 	clima_atual = Clima.ENSOLARADO
 	tem_machado_pedra = false
 	tem_mochila_couro = false
+	tem_balde = false
+	balde_cheio = false
 	vida_jogador = VIDA_MAX_JOGADOR
 	saciedade_jogador = 85.0
 	hidratacao_jogador = 85.0

@@ -18,7 +18,8 @@ var categorias := [
 		"itens": [
 			{"nome": "Estrada", "path": "res://buildings/Estrada.tscn", "icone": "🟫"},
 			{"nome": "Bloco", "path": "res://buildings/Bloco.tscn", "icone": "🟩"},
-			{"nome": "Piso Madeira", "path": "res://buildings/Piso.tscn", "icone": "🪵"}
+			{"nome": "Piso Madeira", "path": "res://buildings/Piso.tscn", "icone": "🪵"},
+			{"nome": "Piso Pedra", "path": "res://buildings/PisoPedra.tscn", "icone": "🪨"}
 		]
 	},
 	{
@@ -26,7 +27,9 @@ var categorias := [
 		"icone": "🏠",
 		"itens": [
 			{"nome": "Parede", "path": "res://buildings/ParedeMadeira.tscn", "icone": "🧱"},
-			{"nome": "Teto", "path": "res://buildings/TetoMadeira.tscn", "icone": "⛺"}
+			{"nome": "Teto", "path": "res://buildings/TetoMadeira.tscn", "icone": "⛺"},
+			{"nome": "Parede Pedra", "path": "res://buildings/ParedePedra.tscn", "icone": "🪨"},
+			{"nome": "Teto Pedra", "path": "res://buildings/TetoPedra.tscn", "icone": "🪨"}
 		]
 	},
 	{
@@ -44,7 +47,9 @@ var categorias := [
 			{"nome": "Baú", "path": "res://buildings/Bau.tscn", "icone": "📦"},
 			{"nome": "Fogueira", "path": "res://buildings/Fogueira.tscn", "icone": "🔥"},
 			{"nome": "Cama", "path": "res://buildings/Cama.tscn", "icone": "🛏"},
+			{"nome": "Fazenda", "path": "res://buildings/Fazenda.tscn", "icone": "🏡"},
 			{"nome": "Canteiro", "path": "res://buildings/Canteiro.tscn", "icone": "🌱"},
+			{"nome": "Coletor Chuva", "path": "res://buildings/ColetorChuva.tscn", "icone": "🌧️"},
 			{"nome": "Poço Água", "path": "res://buildings/PocoAgua.tscn", "icone": "🚰"},
 			{"nome": "Curtume", "path": "res://buildings/Curtume.tscn", "icone": "🧵"}
 		]
@@ -159,6 +164,7 @@ func _renderizar_itens_categoria():
 		var btn_item = Button.new()
 		btn_item.text = item["icone"] + " " + item["nome"]
 		btn_item.add_theme_font_size_override("font_size", 13)
+		if path.ends_with("Canteiro.tscn") and not Global.tem_fazenda(): btn_item.disabled = true; btn_item.text += " (Requer Fazenda)"
 		var cena_sel = cena
 		btn_item.pressed.connect(func():
 			_selecionar_peca_planejador(cena_sel)

@@ -18,14 +18,20 @@ var catalogo := [
 			{"nome": "Piso de Madeira", "cena_path": "res://buildings/Piso.tscn", "icone": "🟫", "desc": "Fundação plana para suportar construções."},
 			{"nome": "Parede de Madeira", "cena_path": "res://buildings/ParedeMadeira.tscn", "icone": "🧱", "desc": "Parede modular com snap em pisos e paredes."},
 			{"nome": "Teto de Madeira", "cena_path": "res://buildings/TetoMadeira.tscn", "icone": "⛺", "desc": "Telhado protetor contra chuvas intensas."},
+			{"nome": "Piso de Pedra", "cena_path": "res://buildings/PisoPedra.tscn", "icone": "🪨", "desc": "Fundacao de pedra."},
+			{"nome": "Parede de Pedra", "cena_path": "res://buildings/ParedePedra.tscn", "icone": "🪨", "desc": "Parede de pedra (220 HP)."},
+			{"nome": "Teto de Pedra", "cena_path": "res://buildings/TetoPedra.tscn", "icone": "🪨", "desc": "Cobertura de pedra."},
 		]
 	},
 	{
 		"categoria": "Sobrevivência",
 		"icone": "🔥",
 		"itens": [
+			{"nome": "Tenda do Sobrevivente", "cena_path": "res://buildings/Tenda.tscn", "icone": "⛺", "desc": "Dormir e salvar o jogo."},
 			{"nome": "Fogueira", "cena_path": "res://buildings/Fogueira.tscn", "icone": "🔥", "desc": "Aquece, ilumina à noite e cozinha alimentos."},
+			{"nome": "Fazenda Central", "cena_path": "res://buildings/Fazenda.tscn", "icone": "🏡", "desc": "Desbloqueia Canteiros."},
 			{"nome": "Canteiro de Cultivo", "cena_path": "res://buildings/Canteiro.tscn", "icone": "🌱", "desc": "Plante 1 Fruta para colher +4 Frutas. Cresce 2x mais rápido na chuva."},
+			{"nome": "Coletor de Chuva", "cena_path": "res://buildings/ColetorChuva.tscn", "icone": "🌧️", "desc": "Acumula agua da chuva."},
 			{"nome": "Poço de Água", "cena_path": "res://buildings/PocoAgua.tscn", "icone": "🚰", "desc": "Fonte de água limpa na base (+50% Sede ao interagir com [E])."},
 			{"nome": "Mesa de Curtume", "cena_path": "res://buildings/Curtume.tscn", "icone": "🧵", "desc": "Curte 2 Carnes Cruas -> +1 Couro ou corta 1 Couro -> +4 Gravetos com [E]."},
 			{"nome": "Baú de Estoque", "cena_path": "res://buildings/Bau.tscn", "icone": "📦", "desc": "Armazena até 150 recursos com descarga rápida."},
@@ -175,9 +181,11 @@ func _renderizar_cards():
 			Global.pedrinhas >= custos["pedr"]
 		)
 
+		var b_faz = path.ends_with("Canteiro.tscn") and not Global.tem_fazenda()
 		var card_btn = Button.new()
 		card_btn.custom_minimum_size = Vector2(200, 115)
 		card_btn.focus_mode = Control.FOCUS_ALL
+		card_btn.disabled = b_faz
 
 		var card_margin = MarginContainer.new()
 		card_margin.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -215,7 +223,7 @@ func _renderizar_cards():
 		if custos["pedr"] > 0: custos_arr.append(str(custos["pedr"]) + "⚪")
 		var txt_custo = " ".join(custos_arr) if not custos_arr.is_empty() else "Grátis"
 		
-		card_custo.text = "Custo: " + txt_custo
+		card_custo.text = "Requer Fazenda Central!" if b_faz else ("Custo: " + txt_custo)
 		card_custo.add_theme_font_size_override("font_size", 12)
 		card_custo.modulate = Color(0.4, 1.0, 0.4) if pode_construir else Color(1.0, 0.4, 0.4)
 		card_custo.mouse_filter = Control.MOUSE_FILTER_IGNORE

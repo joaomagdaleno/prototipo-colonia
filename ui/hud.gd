@@ -221,7 +221,7 @@ func _process(delta):
 		"  |  🥩 " + str(Global.carne_crua) +
 		"  |  🍲 " + str(Global.comida) +
 		"  |  🕒 " + "Dia " + str(Global.dia_atual) + " - " + Global.obter_hora_formatada() +
-		"  |  ⚖️ " + str(snapped(Global.obter_peso_atual(), 0.1)) + "/" + str(int(Global.obter_capacidade_peso())) + (" [PESADO]" if Global.esta_sobrecarregado() else "") + "  |  " + Global.obter_texto_clima() + ("  |  🐺 HORDA NOTURNA!" if Global.is_noite_de_horda() else "")
+		"  |  ⚖️ " + str(snapped(Global.obter_peso_atual(), 0.1)) + "/" + str(int(Global.obter_capacidade_peso())) + (" [PESADO]" if Global.esta_sobrecarregado() else "") + "  |  Peso: " + str(snapped(Global.obter_peso_atual(), 0.1)) + "/" + str(int(Global.obter_capacidade_peso())) + (" [PESADO]" if Global.esta_sobrecarregado() else "") + "  |  " + Global.obter_texto_clima() + ("  |  🐺 HORDA NOTURNA!" if Global.is_noite_de_horda() else "")
 	)
 	if _novo_topo != _ultimo_texto_topo:
 		_ultimo_texto_topo = _novo_topo
@@ -250,8 +250,9 @@ func _process(delta):
 		_timer_lista_colonos -= delta
 		if _timer_lista_colonos <= 0.0:
 			_timer_lista_colonos = 0.25
-			botao_contratar.text = "🤝 Contratar Colono (" + str(Global.CUSTO_CONTRATAR_COLONO) + " Comida)" + (" [Y]" if joy else "")
-			botao_contratar.disabled = Global.comida < Global.CUSTO_CONTRATAR_COLONO
+			var m_col = Global.obter_motivo_bloqueio_colono()
+			botao_contratar.text = ("Contratar Colono (" + str(Global.CUSTO_CONTRATAR_COLONO) + " Comida)" + (" [Y]" if joy else "")) if m_col == "" else m_col
+			botao_contratar.disabled = m_col != ""
 			btn_ferramentas_equipe.text = "✅ Ferramentas Equipe (2x Trabalho)" if Global.equipe_ferramentas else "🪓 Ferramentas Equipe (8 Mad, 6 Ped, 2 Couro)"
 			btn_ferramentas_equipe.disabled = Global.equipe_ferramentas or Global.madeira < 8 or Global.pedra < 6 or Global.couro < 2
 			btn_mochilas_equipe.text = "✅ Mochilas Equipe (30 Cap / +20% Vel)" if Global.equipe_mochilas else "🎒 Mochilas Equipe (6 Couro, 6 Grav)"

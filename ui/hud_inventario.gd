@@ -9,6 +9,7 @@ var btn_machado: Button
 var btn_picareta: Button
 var btn_lanca: Button
 var btn_mochila: Button
+var btn_balde: Button
 
 func _ready():
 	set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -77,6 +78,12 @@ func _ready():
 	btn_mochila.focus_mode = Control.FOCUS_ALL
 	btn_mochila.pressed.connect(func(): Global.craftar_mochila_couro())
 	vbox.add_child(btn_mochila)
+	btn_balde = Button.new()
+	btn_balde.add_theme_font_size_override("font_size", 14)
+	btn_balde.focus_mode = Control.FOCUS_ALL
+	btn_balde.pressed.connect(func(): if not Global.tem_balde: Global.craftar_balde()
+		else: Global.encher_balde())
+	vbox.add_child(btn_balde)
 
 func _pode_beber_agora() -> bool:
 	if Global.esta_chovendo():
@@ -86,7 +93,7 @@ func _pode_beber_agora() -> bool:
 		if abs(jogador.global_position.x) >= 115.0 or abs(jogador.global_position.z) >= 115.0:
 			return true
 		for p in Global.pocos_ativos:
-			if is_instance_valid(p) and p.construida and jogador.global_position.distance_squared_to(p.global_position) <= 16.0:
+			if is_instance_valid(p) and p.construida and p.baldes_agua_poco >= 3 and jogador.global_position.distance_squared_to(p.global_position) <= 16.0:
 				return true
 	return false
 
@@ -156,6 +163,11 @@ func atualizar(deve_mostrar: bool):
 
 	btn_mochila.text = "✅ Mochila de Couro Equipada (+15 Cap)" if Global.tem_mochila_couro else "🎒 Fabricar Mochila de Couro (+15 Cap | 4 Couros + 3 Gravetos)"
 	btn_mochila.disabled = Global.tem_mochila_couro or Global.couro < 4 or Global.gravetos < 3
+	var pa = Global.esta_chovendo()
+	var jr = get_tree().current_scene.get_node_or_null("Jogador")
+	if is_instance_valid(jr) and (abs(jr.global_position.x) >= 115.0 or abs(jr.global_position.z) >= 115.0): pa = true
+	btn_balde.text = "Fabricar Balde (3 Mad + 2 Grav)" if not Global.tem_balde else ("Balde Cheio (Use no Poco)" if Global.balde_cheio else ("Encher Balde" if pa else "Balde Vazio (Va a costa/chuva)"))
+	btn_balde.disabled = (Global.madeira < 3 or Global.gravetos < 2) if not Global.tem_balde else (Global.balde_cheio or not pa)
 
 	if not estava_aberto:
 		btn_comer_refeicao.grab_focus()

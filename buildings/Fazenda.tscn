@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://buildings/estrutura_construivel.gd" id="1_faz"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_faz"]
+size = Vector3(2.6, 2.0, 2.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_faz"]
+albedo_color = Color(0.58, 0.24, 0.18, 1)
+roughness = 0.85
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_faz"]
+size = Vector3(2.6, 2.0, 2.6)
+
+[node name="Fazenda" type="Node3D"]
+script = ExtResource("1_faz")
+custo_madeira = 12
+custo_pedra = 6
+custo_gravetos = 6
+is_fazenda = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+mesh = SubResource("BoxMesh_faz")
+surface_material_override/0 = SubResource("StandardMaterial3D_faz")
+
+[node name="CorpoFisico" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CorpoFisico"]
+shape = SubResource("BoxShape3D_faz")
+
+[node name="AreaInteracao" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AreaInteracao"]
+shape = SubResource("BoxShape3D_faz")

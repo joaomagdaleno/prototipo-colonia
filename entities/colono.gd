@@ -151,6 +151,11 @@ func _physics_process(delta):
 
 	if direcao.length() > 0.1:
 		direcao = direcao.normalized()
+		if not Global.esta_perto_de_estrada(global_position, 1.4):
+			var via = Global.obter_estrada_mais_proxima(global_position, 10.0)
+			if via != Vector3.INF and via.distance_squared_to(agent.target_position) < global_position.distance_squared_to(agent.target_position):
+				var dv = Vector3(via.x - global_position.x, 0, via.z - global_position.z)
+				if dv.length() > 0.2: direcao = direcao.lerp(dv.normalized(), 0.65).normalized()
 		var vel = _calcular_velocidade_atual()
 		rotation.y = lerp_angle(rotation.y, atan2(direcao.x, direcao.z), 0.1)
 		agent.set_velocity(Vector3(direcao.x * vel, velocity.y, direcao.z * vel))

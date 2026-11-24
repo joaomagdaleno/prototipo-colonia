@@ -1,0 +1,41 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://buildings/estrutura_construivel.gd" id="1_ped"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_parped"]
+size = Vector3(1.0, 2.4, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_parped"]
+albedo_color = Color(0.38, 0.40, 0.44, 1)
+roughness = 0.92
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_parped"]
+size = Vector3(1.0, 2.4, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_intparped"]
+size = Vector3(1.2, 2.6, 0.8)
+
+[node name="ParedePedra" type="Node3D" groups=["paredes"]]
+script = ExtResource("1_ped")
+custo_madeira = 0
+custo_pedra = 6
+vida_maxima = 220
+is_parede = true
+modo_macro = false
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+mesh = SubResource("BoxMesh_parped")
+surface_material_override/0 = SubResource("StandardMaterial3D_parped")
+
+[node name="CorpoFisico" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CorpoFisico"]
+shape = SubResource("BoxShape3D_parped")
+
+[node name="AreaInteracao" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AreaInteracao"]
+shape = SubResource("BoxShape3D_intparped")

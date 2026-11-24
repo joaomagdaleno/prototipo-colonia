@@ -8,10 +8,18 @@ class_name EstruturaConstruivel
 
 @export var is_bancada: bool = false
 @export var is_cama: bool = false
+@export var is_tenda: bool = false
 @export var is_fogueira: bool = false
 @export var is_bau: bool = false
 @export var is_canteiro: bool = false
+@export var is_fazenda: bool = false
 @export var is_poco: bool = false
+var baldes_agua_poco: int = 0
+const BALDES_ATIVAR_POCO: int = 3
+@export var is_coletor_chuva: bool = false
+var agua_coletor: int = 0
+const CAPACIDADE_COLETOR: int = 5
+var _t_chuva: float = 0.0
 @export var is_curtume: bool = false
 var canteiro_plantado: bool = false
 var progresso_cultivo: float = 0.0
@@ -313,6 +321,9 @@ func demolir():
 	queue_free()
 
 func _process(delta):
+	if construida and is_coletor_chuva and agua_coletor < 5 and Global.esta_chovendo():
+		_t_chuva += delta
+		if _t_chuva >= 12.0: _t_chuva = 0.0; agua_coletor += 1
 	# Sï¿½ roda em fogueiras construï¿½das!
 	if Global.esta_chovendo():
 		_timer_chuva -= delta

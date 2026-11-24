@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://buildings/estrutura_construivel.gd" id="1_ped"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_pisoped"]
+size = Vector3(1, 0.1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pisoped"]
+albedo_color = Color(0.42, 0.44, 0.48, 1)
+roughness = 0.9
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pisoped"]
+size = Vector3(1, 0.1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_intpisoped"]
+size = Vector3(1.1, 0.5, 1.1)
+
+[node name="PisoPedra" type="Node3D" groups=["pisos"]]
+script = ExtResource("1_ped")
+custo_madeira = 0
+custo_pedra = 3
+vida_maxima = 180
+modo_macro = false
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_pisoped")
+surface_material_override/0 = SubResource("StandardMaterial3D_pisoped")
+
+[node name="CorpoFisico" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CorpoFisico"]
+shape = SubResource("BoxShape3D_pisoped")
+
+[node name="AreaInteracao" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AreaInteracao"]
+shape = SubResource("BoxShape3D_intpisoped")

@@ -1,0 +1,41 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://buildings/estrutura_construivel.gd" id="1_ped"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_tetped"]
+size = Vector3(1.0, 0.15, 1.0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tetped"]
+albedo_color = Color(0.35, 0.37, 0.41, 1)
+roughness = 0.92
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tetped"]
+size = Vector3(1.0, 0.15, 1.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_inttetped"]
+size = Vector3(1.1, 0.6, 1.1)
+
+[node name="TetoPedra" type="Node3D" groups=["tetos"]]
+script = ExtResource("1_ped")
+custo_madeira = 0
+custo_pedra = 4
+vida_maxima = 180
+is_teto = true
+modo_macro = false
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.075, 0)
+mesh = SubResource("BoxMesh_tetped")
+surface_material_override/0 = SubResource("StandardMaterial3D_tetped")
+
+[node name="CorpoFisico" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.075, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CorpoFisico"]
+shape = SubResource("BoxShape3D_tetped")
+
+[node name="AreaInteracao" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.075, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AreaInteracao"]
+shape = SubResource("BoxShape3D_inttetped")

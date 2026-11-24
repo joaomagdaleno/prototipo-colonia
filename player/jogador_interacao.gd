@@ -54,16 +54,20 @@ func executar_interacao():
 			elif estrutura.is_bau and estrutura.construida:
 				estrutura.transferir_tudo_do_jogador()
 			elif estrutura.is_cama and estrutura.construida:
-				if Global.esta_de_noite():
-					Global.hora_do_dia = 6.0
-					print("Você dormiu na cama até amanhecer (06:00)!")
-				else:
-					print("Só é possível dormir durante a noite (após 20:00).")
+				if Global.esta_de_noite(): Global.hora_do_dia = 6.0; print("Voce dormiu na cama ate 06:00!")
+			elif estrutura.is_tenda and estrutura.construida:
+				if Global.esta_de_noite(): Global.hora_do_dia = 6.0; Global.salvar_jogo(); print("Dormiu na Tenda e salvou!")
+				else: Global.salvar_jogo(); print("Jogo salvo na Tenda!")
 			elif estrutura.is_curtume and estrutura.construida:
 				estrutura.curtir_material()
+			elif estrutura.is_coletor_chuva and estrutura.construida:
+				if estrutura.agua_coletor > 0:
+					if Global.tem_balde and not Global.balde_cheio: estrutura.agua_coletor -= 1; Global.encher_balde(); AudioManager.tocar("coleta")
+					elif Global.hidratacao_jogador < 98.0: estrutura.agua_coletor -= 1; Global.beber_agua_jogador(); AudioManager.tocar("coleta")
 			elif estrutura.is_poco and estrutura.construida:
-				Global.beber_agua_jogador()
-				AudioManager.tocar("coleta")
+				if estrutura.baldes_agua_poco < 3:
+					if Global.tem_balde and Global.balde_cheio: Global.balde_cheio = false; estrutura.baldes_agua_poco += 1; AudioManager.tocar("coleta")
+				else: Global.beber_agua_jogador(); AudioManager.tocar("coleta")
 			elif estrutura.is_canteiro and estrutura.construida:
 				if not estrutura.canteiro_plantado:
 					if not estrutura.plantar_canteiro():
@@ -92,8 +96,9 @@ func executar_interacao():
 			return
 
 	# Se não interagiu com nenhum objeto e está na beira do mar com sede, bebe água
-	if _esta_perto_da_agua() and Global.hidratacao_jogador < 98.0:
-		Global.beber_agua_jogador()
+	if _esta_perto_da_agua():
+		if Global.tem_balde and not Global.balde_cheio: Global.encher_balde(); AudioManager.tocar("coleta")
+		elif Global.hidratacao_jogador < 98.0: Global.beber_agua_jogador()
 
 func obter_dica_mira() -> String:
 	if jogador.construindo_1p:
@@ -135,8 +140,10 @@ func obter_dica_mira() -> String:
 			if Global.carne_crua >= 2: return btn_interagir + " Curtir Couro (2 Carne -> +1 Couro)"
 			elif Global.couro >= 1: return btn_interagir + " Cortar Tiras (1 Couro -> +4 Gravetos)"
 			return "Mesa de Curtume (Requer 2 Carne Crua ou 1 Couro)"
-		elif est.is_poco:
-			return btn_interagir + " Beber Água do Poço (+45% Sede)"
+		elif est.is_tenda: return btn_interagir + (" Dormir e Salvar" if Global.esta_de_noite() else " Salvar na Tenda")
+		elif est.is_fazenda: return "Fazenda Central (Canteiros Desbloqueados)"
+		elif est.is_coletor_chuva: return "Coletor Vazio" if est.agua_coletor <= 0 else (btn_interagir + " Usar Coletor (" + str(est.agua_coletor) + "/5)")
+		elif est.is_poco: return (btn_interagir + " Despejar Balde" if (Global.tem_balde and Global.balde_cheio) else "Poco Seco (" + str(est.baldes_agua_poco) + "/3)") if est.baldes_agua_poco < 3 else (btn_interagir + " Beber Agua do Poco")
 		elif est.is_canteiro:
 			if not est.canteiro_plantado:
 				return btn_interagir + " Plantar Semente (1 Fruta)"

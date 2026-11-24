@@ -82,18 +82,13 @@ func escolher_proxima_tarefa() -> Vector3:
 			return cant_vazio.global_position
 
 	# 3. Comida e Frutas (arbustos marcados)
-	var arbusto = _buscar_mais_proximo("recursos_marcados", func(a): return a.is_in_group("arbustos") and a.tem_frutas and not a.reservado)
+	var arbusto = _buscar_mais_proximo("recursos_marcados", func(a): return a.is_in_group("arbustos") and a.tem_frutas and not a.reservado and Global.esta_perto_de_estrada(a.global_position, 10.0))
 	if arbusto:
 		_definir_alvo(arbusto, "arbusto")
 		arbusto.reservado = true
 		return arbusto.global_position
 
-	# 4. Itens soltos no chão marcados
-	var item = _buscar_mais_proximo("recursos_marcados", func(c): return c.is_in_group("coletaveis_chao") and not c.reservado)
-	if item:
-		_definir_alvo(item, "coletavel")
-		item.reservado = true
-		return item.global_position
+	# 4. Itens soltos no chao sao exclusivos da 1a Pessoa
 
 	# 5. Projetos de Construção que podem ser pagos
 	var projeto = _buscar_mais_proximo("projetos", func(p): return not p.construida and not p.reservado and p.pode_pagar())
@@ -103,14 +98,14 @@ func escolher_proxima_tarefa() -> Vector3:
 		return projeto.global_position
 
 	# 6. Madeira (Árvores Marcadas)
-	var arvore = _buscar_mais_proximo("recursos_marcados", func(a): return a.is_in_group("arvores") and not a.cortada and not a.reservado)
+	var arvore = _buscar_mais_proximo("recursos_marcados", func(a): return a.is_in_group("arvores") and not a.cortada and not a.reservado and Global.esta_perto_de_estrada(a.global_position, 10.0))
 	if arvore:
 		_definir_alvo(arvore, "arvore")
 		arvore.reservado = true
 		return arvore.global_position
 
 	# 7. Mineração (Pedras Grandes Marcadas)
-	var pedra = _buscar_mais_proximo("recursos_marcados", func(r): return r.is_in_group("pedras") and not r.quebrada and not r.reservado)
+	var pedra = _buscar_mais_proximo("recursos_marcados", func(r): return r.is_in_group("pedras") and not r.quebrada and not r.reservado and Global.esta_perto_de_estrada(r.global_position, 10.0))
 	if pedra:
 		_definir_alvo(pedra, "pedra")
 		pedra.reservado = true
@@ -257,7 +252,7 @@ func _buscar_tarefa_especializada() -> Vector3:
 				var cv = _buscar_mais_proximo(Global.canteiros_ativos, func(c): return c.construida and not c.canteiro_plantado and not c.reservado_colono)
 				if cv:
 					_definir_alvo(cv, "plantar_canteiro"); cv.reservado_colono = true; return cv.global_position
-			var arb = _buscar_mais_proximo("recursos_marcados", func(a): return a.is_in_group("arbustos") and a.tem_frutas and not a.reservado)
+			var arb = _buscar_mais_proximo("recursos_marcados", func(a): return a.is_in_group("arbustos") and a.tem_frutas and not a.reservado and Global.esta_perto_de_estrada(a.global_position, 10.0))
 			if arb:
 				_definir_alvo(arb, "arbusto"); arb.reservado = true; return arb.global_position
 		"Construtor":
@@ -265,13 +260,11 @@ func _buscar_tarefa_especializada() -> Vector3:
 			if proj:
 				_definir_alvo(proj, "projeto"); proj.reservado = true; return proj.global_position
 		"Coletor":
-			var it = _buscar_mais_proximo("recursos_marcados", func(c): return c.is_in_group("coletaveis_chao") and not c.reservado)
-			if it:
-				_definir_alvo(it, "coletavel"); it.reservado = true; return it.global_position
-			var arv = _buscar_mais_proximo("recursos_marcados", func(a): return a.is_in_group("arvores") and not a.cortada and not a.reservado)
+			# Coletaveis de chao sao exclusivos da 1a Pessoa
+			var arv = _buscar_mais_proximo("recursos_marcados", func(a): return a.is_in_group("arvores") and not a.cortada and not a.reservado and Global.esta_perto_de_estrada(a.global_position, 10.0))
 			if arv:
 				_definir_alvo(arv, "arvore"); arv.reservado = true; return arv.global_position
-			var ped = _buscar_mais_proximo("recursos_marcados", func(r): return r.is_in_group("pedras") and not r.quebrada and not r.reservado)
+			var ped = _buscar_mais_proximo("recursos_marcados", func(r): return r.is_in_group("pedras") and not r.quebrada and not r.reservado and Global.esta_perto_de_estrada(r.global_position, 10.0))
 			if ped:
 				_definir_alvo(ped, "pedra"); ped.reservado = true; return ped.global_position
 	return Vector3.INF
