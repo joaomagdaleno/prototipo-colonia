@@ -168,7 +168,7 @@ func _executar_ataque(_delta: float):
 
 func _buscar_muro_a_frente() -> EstruturaConstruivel:
 	var pos := global_position
-	for est in Global.fogueiras_ativas:
+	for est in get_tree().get_nodes_in_group("construidos"):
 		if is_instance_valid(est) and est is EstruturaConstruivel:
 			if est.is_muro or est.is_parede or (est.is_portao and not est.portao_aberto):
 				if pos.distance_squared_to(est.global_position) <= 3.24: # 1.8 metros

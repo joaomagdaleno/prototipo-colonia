@@ -4,7 +4,8 @@ var _timer_sol: float = 0.0
 var _cam_aerea_cache: Camera3D = null
 
 func _ready():
-	directional_shadow_max_distance = 42.0
+	directional_shadow_max_distance = 65.0
+	shadow_bias = 0.02
 	_atualizar_sol()
 
 func _process(delta):

@@ -100,7 +100,7 @@ func atualizar(deve_mostrar: bool):
 	var camas = Global.camas_ativas.size()
 	var projetos = get_tree().get_nodes_in_group("projetos").size()
 	var status_equip = "Machado T" + str(Global.tier_machado) + " | Picareta T" + str(Global.tier_picareta) + " | Lança T" + str(Global.tier_lanca)
-	var status_mochila = "Mochila Couro (+25% Vel / +1 Coleta)" if Global.tem_mochila_couro else "Sem Mochila"
+	var status_mochila = ("Mochila Couro (+15 Cap / +25% Vel)" if Global.tem_mochila_couro else "Sem Mochila") + " | Peso: " + str(snapped(Global.obter_peso_atual(), 0.1)) + "/" + str(int(Global.obter_capacidade_peso()))
 	var status_cura = "ATIVA (+2 HP/s)" if (Global.saciedade_jogador >= 70.0 and Global.hidratacao_jogador >= 70.0 and Global.tempo_sem_combate >= 6.0) else "Inativa (Requer >=70% Fome/Sede e paz)"
 	var dica = "[B / Círculo / Start] Fechar  |  [D-Pad] Navegar  |  [Y] Melhorar" if Global.usando_joystick else "[I / ESC] Fechar  |  [Clique] Usar/Fabricar"
 
@@ -154,7 +154,7 @@ func atualizar(deve_mostrar: bool):
 		btn_lanca.text = "✅ Lança Ponta de Pedra T2 Máxima (4x Dano em Caça/Combate)"
 		btn_lanca.disabled = true
 
-	btn_mochila.text = "✅ Mochila de Couro Equipada" if Global.tem_mochila_couro else "🎒 Fabricar Mochila de Couro (4 Couros + 3 Gravetos)"
+	btn_mochila.text = "✅ Mochila de Couro Equipada (+15 Cap)" if Global.tem_mochila_couro else "🎒 Fabricar Mochila de Couro (+15 Cap | 4 Couros + 3 Gravetos)"
 	btn_mochila.disabled = Global.tem_mochila_couro or Global.couro < 4 or Global.gravetos < 3
 
 	if not estava_aberto:

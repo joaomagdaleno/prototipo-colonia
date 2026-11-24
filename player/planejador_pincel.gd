@@ -75,5 +75,5 @@ func _pintar_recursos(centro: Vector3, marcar: bool):
 		var col = hit.get("collider")
 		if not is_instance_valid(col): continue
 		var alvo = col if col.has_method("alternar_marcacao") else col.get_parent()
-		if is_instance_valid(alvo) and alvo.has_method("alternar_marcacao"):
+		if is_instance_valid(alvo) and not alvo.is_in_group("coletaveis_chao") and alvo.has_method("alternar_marcacao"):
 			alvo.alternar_marcacao(marcar)

@@ -88,7 +88,7 @@ func gerar_mundo_completo():
 
 	_espalhar(cena_arvore, qtd_arvores, raio, 4.0, posicoes_ocupadas, true, 145.0, true)
 	_espalhar(cena_rocha, qtd_rochas, raio, 3.0, posicoes_ocupadas, true, 95.0, false)
-	_espalhar(cena_arbusto, qtd_arbustos, raio, 2.2, posicoes_ocupadas, true, 55.0, false)
+	_espalhar(cena_arbusto, qtd_arbustos, raio, 2.2, posicoes_ocupadas, true, 55.0, true)
 	_espalhar_multimesh(cena_graveto, qtd_gravetos, raio, 1.5, posicoes_ocupadas, "MultiMeshGravetos")
 	_espalhar_multimesh(cena_pedrinha, qtd_pedrinhas, raio, 1.5, posicoes_ocupadas, "MultiMeshPedrinhas")
 
@@ -156,7 +156,7 @@ func _espalhar_multimesh(cena: PackedScene, qtd: int, raio: float, dist_min: flo
 	mmi.name = nome_lote
 	mmi.multimesh = mm
 	mmi.material_override = mat_base
-	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	mmi.visibility_range_end = 42.0
 	mmi.visibility_range_end_margin = 6.0
 	add_child(mmi)
@@ -185,7 +185,7 @@ func aplicar_otimizacao_item(inst: Node3D):
 	for sub in inst.get_children():
 		if sub is MeshInstance3D:
 			if not sombra:
-				sub.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+				sub.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 			sub.visibility_range_begin = 0.0
 			sub.visibility_range_end = dist_visao
 			sub.visibility_range_end_margin = 8.0
@@ -246,7 +246,7 @@ func _espalhar(cena: PackedScene, qtd: int, raio: float, dist_min: float, ocupad
 					elif _cache_meshes_vega8.has(chave_m):
 						sub.mesh = _cache_meshes_vega8[chave_m]
 					if not sombra:
-						sub.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+						sub.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 					sub.visibility_range_begin = 0.0
 					sub.visibility_range_end = dist_visao
 					sub.visibility_range_end_margin = 8.0
@@ -277,7 +277,7 @@ func _spawnar_fauna():
 
 	var px = randf_range(-100.0, 100.0)
 	var pz = randf_range(-100.0, 100.0)
-	var py = _obter_altura_chao(px, pz) + 0.5
+	var py = _obter_altura_chao(px, pz) + 0.05
 
 	var inst = cena_animal.instantiate()
 	inst.especie = "cervo" if randf() < 0.3 else "coelho"
@@ -300,7 +300,7 @@ func _spawnar_inimigo_noturno():
 	var dist = randf_range(28.0, 45.0)
 	var px = clamp(centro.x + cos(ang) * dist, -110.0, 110.0)
 	var pz = clamp(centro.z + sin(ang) * dist, -110.0, 110.0)
-	var py = _obter_altura_chao(px, pz) + 0.5
+	var py = _obter_altura_chao(px, pz) + 0.05
 
 	var inst = cena_inimigo.instantiate()
 	inst.position = Vector3(px, py, pz)

@@ -22,7 +22,7 @@ func vincular_multimesh(mm: MultiMesh, idx: int):
 func _otimizar_renderizacao_vega8():
 	for filho in get_children():
 		if filho is MeshInstance3D:
-			filho.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			filho.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 			filho.visibility_range_begin = 0.0
 			filho.visibility_range_end = 28.0
 			filho.visibility_range_end_margin = 4.0
@@ -35,10 +35,11 @@ func alternar_marcacao(ativar: bool):
 	if ativar: add_to_group("recursos_marcados")
 	else: remove_from_group("recursos_marcados")
 	if has_node("MeshInstance3D"):
+		var mesh = $MeshInstance3D
 		if multimesh_ref != null:
-			.visible = ativar
-		.transparency = 0.35 if ativar else 0.0
-		.visibility_range_end = 150.0 if ativar else 28.0
+			mesh.visible = ativar
+		mesh.transparency = 0.35 if ativar else 0.0
+		mesh.visibility_range_end = 150.0 if ativar else 28.0
 
 # Chamado pelo Jogador (E / X) ou pelo Colono
 func colher():

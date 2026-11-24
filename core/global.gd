@@ -186,6 +186,24 @@ func craftar_machado_pedra() -> bool:
 	print("🪓 Machado de Pedra fabricado!")
 	return true
 
+const CAPACIDADE_PESO_BASE := 15.0
+const BONUS_PESO_MOCHILA := 15.0
+
+func obter_peso_atual() -> float:
+return (
+pedra * 2.5 +
+madeira * 1.5 +
+carne_crua * 1.0 +
+(comida + couro) * 0.8 +
+(gravetos + pedrinhas + frutas) * 0.5
+)
+
+func obter_capacidade_peso() -> float:
+return CAPACIDADE_PESO_BASE + (BONUS_PESO_MOCHILA if tem_mochila_couro else 0.0)
+
+func esta_sobrecarregado() -> bool:
+return obter_peso_atual() > obter_capacidade_peso()
+
 func craftar_mochila_couro() -> bool:
 	if tem_mochila_couro or couro < 4 or gravetos < 3:
 		return false
@@ -196,7 +214,11 @@ func craftar_mochila_couro() -> bool:
 	return true
 
 func contratar_colono() -> bool:
-	if comida < CUSTO_CONTRATAR_COLONO:
+	var total_camas := 0
+	for c in camas_ativas:
+		if is_instance_valid(c) and c.construida:
+			total_camas += 1
+	if comida < CUSTO_CONTRATAR_COLONO or get_tree().get_nodes_in_group("colonos").size() >= total_camas:
 		return false
 
 	var bancada = get_tree().current_scene.get_node_or_null("Bancada")

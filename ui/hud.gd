@@ -221,7 +221,7 @@ func _process(delta):
 		"  |  🥩 " + str(Global.carne_crua) +
 		"  |  🍲 " + str(Global.comida) +
 		"  |  🕒 " + "Dia " + str(Global.dia_atual) + " - " + Global.obter_hora_formatada() +
-		"  |  " + Global.obter_texto_clima() + ("  |  🐺 HORDA NOTURNA!" if Global.is_noite_de_horda() else "")
+		"  |  ⚖️ " + str(snapped(Global.obter_peso_atual(), 0.1)) + "/" + str(int(Global.obter_capacidade_peso())) + (" [PESADO]" if Global.esta_sobrecarregado() else "") + "  |  " + Global.obter_texto_clima() + ("  |  🐺 HORDA NOTURNA!" if Global.is_noite_de_horda() else "")
 	)
 	if _novo_topo != _ultimo_texto_topo:
 		_ultimo_texto_topo = _novo_topo
