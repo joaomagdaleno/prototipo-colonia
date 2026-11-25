@@ -81,8 +81,12 @@ func _ready():
 	btn_balde = Button.new()
 	btn_balde.add_theme_font_size_override("font_size", 14)
 	btn_balde.focus_mode = Control.FOCUS_ALL
-	btn_balde.pressed.connect(func(): if not Global.tem_balde: Global.craftar_balde()
-		else: Global.encher_balde())
+	btn_balde.pressed.connect(func():
+		if not Global.tem_balde:
+			Global.craftar_balde()
+		else:
+			Global.encher_balde()
+	)
 	vbox.add_child(btn_balde)
 
 func _pode_beber_agora() -> bool:
